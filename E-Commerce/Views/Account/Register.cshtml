@@ -1,0 +1,120 @@
+﻿@{
+    Layout = null;
+}
+@model E_Commerce.Models.RegisterViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Elegant Suits Boutique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="~/auth/register.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel with Branding -->
+        <div class="left-panel">
+            <div class="logo">Elegant<span>Suits</span></div>
+            <p class="tagline">Discover our exclusive collection of gents suits, designed to bring out your elegance and confidence.</p>
+            <ul class="features">
+                <li><i class="fas fa-check-circle"></i> Premium quality fabrics</li>
+                <li><i class="fas fa-check-circle"></i> Tailored for perfect fit</li>
+                <li><i class="fas fa-check-circle"></i> Exclusive designs</li>
+                <li><i class="fas fa-check-circle"></i> Fast & free delivery</li>
+                <li><i class="fas fa-check-circle"></i> Easy returns & exchanges</li>
+            </ul>
+        </div>
+
+        <!-- Right Panel with Signup Form -->
+        <div class="right-panel">
+            <div class="form-header">
+                <h1>Create Account</h1>
+                <p>Join our fashion community and get 15% off on your first order!</p>
+            </div>
+
+            <!-- Success Message (Hidden by Default) -->
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i> Account created successfully! Redirecting...
+            </div>
+
+            <form id="signupForm" asp-controller="Account" asp-action="Register" method="post">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="FirstName">First Name</label>
+                        <input asp-for="FirstName" id="firstName" placeholder="Enter your first name" required>
+                        <div class="error" id="firstNameError">Please enter a valid first name</div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LastName">Last Name</label>
+                        <input asp-for="LastName" id="lastName" placeholder="Enter your last name" required>
+                        <div class="error" id="lastNameError">Please enter a valid last name</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email">Email Address</label>
+                    <input type="email" asp-for="Email" id="email" placeholder="Enter your email address" required>
+                    <div class="error" id="emailError">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="PhoneNumber">Phone Number</label>
+                    <input type="tel" asp-for="PhoneNumber" id="phone" placeholder="Enter your phone number" required>
+                    <div class="error" id="phoneError">Please enter a valid phone number</div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password">Password</label>
+                    <div class="password-container">
+                        <input type="password" asp-for="Password" id="password" placeholder="Create a strong password" required>
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error" id="passwordError">Password must be at least 8 characters with letters and numbers</div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword">Confirm Password</label>
+                    <div class="password-container">
+                        <input type="password" asp-for="ConfirmPassword" id="confirmPassword" placeholder="Re-enter your password" required>
+                        <button type="button" class="toggle-password" id="toggleConfirmPassword">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error" id="confirmPasswordError">Passwords do not match</div>
+                </div>
+
+                <div class="terms">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                </div>
+
+                <button type="submit" class="submit-btn">Create Account</button>
+
+                <div class="divider">Or sign up with</div>
+
+                <!-- Google Signup Button with Individual Letter Icons -->
+                <a href="#" class="google-signup" id="googleSignup">
+                    <div class="google-icon">
+                        <span class="letter-g">G</span>
+                        <span class="letter-o1">o</span>
+                        <span class="letter-o2">o</span>
+                        <span class="letter-g2">g</span>
+                        <span class="letter-l">l</span>
+                        <span class="letter-e">e</span>
+                    </div>
+                </a>
+
+                <div class="login-link">
+                    Already have an account? <a asp-controller="Account" asp-action="Login">Log in here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="~/auth/register.js"></script>
+</body>
+</html>

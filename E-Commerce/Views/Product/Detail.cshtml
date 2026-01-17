@@ -1,0 +1,344 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+@model E_Commerce.Models.Product
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <h1><i class="fas fa-info-circle"></i> Product Details</h1>
+        </div>
+
+        <div class="header-controls">
+            <a class="btn btn-outline" asp-controller="Product" asp-action="Index">
+                <i class="fas fa-arrow-left"></i> Back to Products
+            </a>
+            <div class="admin-profile">
+                <div class="admin-avatar">AS</div>
+                <div class="admin-info">
+                    <h3>Admin Sharma</h3>
+                    <p>Store Manager</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-button">
+        <a class="btn btn-outline" asp-controller="Product" asp-action="Index">
+            <i class="fas fa-arrow-left"></i> Back to Products List
+        </a>
+    </div>
+
+    <!-- Product Details Container -->
+    <div class="product-details-container">
+        <div class="product-header">
+            <div class="product-title">
+                <h2>@Model.Name</h2>
+                <div class="product-meta">
+                    <span class="product-id">SKU: @Model.SKU</span>
+                    <span class="product-id">ID: #@Model.Id</span>
+                    <span class="product-status-badge status-@(Model.IsActive ? "active" : "inactive")}">
+                        @(Model.IsActive ? "Active" : "Inactive")
+                    </span>
+                    <span class="product-id">Availability: @(Model.Availability.Replace('-', ' ').ToUpper())</span>
+                </div>
+            </div>
+            <div class="product-actions">
+                <a class="btn btn-primary" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.Id">
+                    <i class="fas fa-edit"></i> Edit Product
+                </a>
+                <a class="btn btn-secondary">
+                    <i class="fas fa-copy"></i> Generate PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- Product Information Grid -->
+        <div class="product-info-grid">
+            <div class="info-card">
+                <h3><i class="fas fa-tag"></i> Category</h3>
+                <p>@Model.Category.Name</p>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-rupee-sign"></i> Base Price</h3>
+                <p class="price">₹@(Model.Price.ToString())</p>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-barcode"></i> Product Code</h3>
+                <p>@Model.SKU</p>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-building"></i> Brand</h3>
+                <p>@Model.Brand</p>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-weight"></i> Weight</h3>
+                <p>@Model.Weight grams</p>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-tshirt"></i> Fabric</h3>
+                <p>@Model.Fabric</p>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-calendar-plus"></i> Added On</h3>
+                <p>@Model.CreatedAt</p>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-calendar-check"></i> Last Updated</h3>
+                <p>@Model.UpdatedAt</p>
+            </div>
+        </div>
+
+        <!-- Short Description -->
+        <div class="description-section">
+            <h3 class="section-title"><i class="fas fa-align-left"></i> Short Description</h3>
+            <div class="description-content">
+                <p>@Model.ShortDescription</p>
+            </div>
+        </div>
+
+        <!-- Color Variants Section -->
+        <div class="color-variants-section">
+            <h3 class="section-title"><i class="fas fa-palette"></i> Color Variants @Model.ProductColors.Count()</h3>
+            <div class="color-variants-container" id="colorVariantsContainer">
+                @* ${generateColorVariantsHTML(product.colorVariants, product.basePrice)} *@
+                @foreach (var variants in Model.ProductColors)
+                {
+                    string stockClass = "stock-out";
+                    string stockText = "Out of Stock";
+
+                    if (variants.Stock > 10)
+                    {
+                        stockClass = "stock-in";
+                        stockText = $"{variants.Stock} in stock";
+                    }
+                    else if (variants.Stock > 0)
+                    {
+                        stockClass = "stock-low";
+                        stockText = $"Low stock {variants.Stock}";
+                    }
+
+                    <div class="color-variant-card">
+                        <div class="color-variant-header">
+                            <div class="color-info">
+                                <div class="color-indicator" style="background-color: @variants.ColorCode;"></div>
+                                <span class="color-name">@variants.ColorName</span>
+                            </div>
+                            <div class="color-price">
+                                ₹@(Model.Price + variants.ExtraPrice)
+
+                                @if (variants.ExtraPrice > 0)
+                                {
+                                    <span style="font-size: 14px; color: #777;">
+                                        (+₹@variants.ExtraPrice)
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="color-variant-details">
+                            <div class="color-detail-item">
+                                <h4>Stock Status</h4>
+                                <div class="stock-status">
+                                    <div class="stock-indicator @stockClass"></div>
+                                    <p>@stockText</p>
+                                </div>
+                            </div>
+
+                            <div class="color-detail-item">
+                                <h4>Available Sizes</h4>
+                                <div class="sizes-container">
+                                    @foreach (var size in variants.Sizes)
+                                    {
+                                        <span class="size-badge available">@size</span>
+                                    }
+                                </div>
+                            </div>
+
+
+                            <div class="color-detail-item">
+                                <h4>Stock Quantity</h4>
+                                <p>@variants.Stock units</p>
+                            </div>
+
+                            <div class="color-detail-item">
+                                <h4>Extra Price</h4>
+                                <p>₹@variants.ExtraPrice</p>
+                            </div>
+                        </div>
+
+                        <div class="color-images-section">
+                            <h4 style="margin: 20px 0 10px 20px; color: #555;">Color Specific Images @variants.Images.Count</h4>
+                            <div class="images-container">
+                                @* ${generateImagesHTML(variant.images)} *@
+                                @foreach(var images in variants.Images)
+                                {
+                                    <div class="image-item">
+                                        <img src="~/ProductImages/@images.ImagePath" alt="Product Image ${index + 1}" loading="lazy">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+            </div>
+        </div>
+
+        <!-- Full Description -->
+        <div class="description-section">
+            <h3 class="section-title"><i class="fas fa-info-circle"></i> Complete Product Details</h3>
+            <div class="description-content">
+                @Model.FullDescription
+                <h4>Occasion:</h4>
+                <p>@Model.Occasion</p>
+
+                <h4>Care Instructions:</h4>
+                <p>@Model.CareInstruction</p>
+            </div>
+        </div>
+
+        <!-- Product Videos Section -->
+        @if (Model.Videos != null && Model.Videos.Any())
+        {
+            <div class="videos-section">
+                <h3 class="section-title"><i class="fas fa-video"></i> Product Videos (@Model.Videos.Count())</h3>
+                <div class="videos-container">
+                    @foreach (var video in Model.Videos)
+                    {
+                        <div class="video-card">
+                            <div class="video-player">
+                                <video controls preload="metadata" poster="/path/to/poster-image.jpg">
+                                    <source src="~/ProductVideos/@video.VideoPath" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="video-controls">
+                                    <button class="video-control-btn play-pause">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    <div class="video-progress">
+                                        <div class="progress-bar"></div>
+                                    </div>
+                                    <div class="video-time">00:00 / 00:00</div>
+                                    <button class="video-control-btn volume">
+                                        <i class="fas fa-volume-up"></i>
+                                    </button>
+                                    <button class="video-control-btn fullscreen">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="video-info">
+                                <h4>Product Video @(Model.Videos.ToList().IndexOf(video) + 1)</h4>
+                                <p>Size: <span class="video-size">@((video.VideoSize / 1024 / 1024).ToString("0.00") + " MB")</span></p>
+                                <p>Format: MP4</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="videos-section">
+                <h3 class="section-title"><i class="fas fa-video"></i> Product Videos</h3>
+                <div class="no-videos">
+                    <div class="no-videos-icon">
+                        <i class="fas fa-video-slash"></i>
+                    </div>
+                    <h4>No Videos Available</h4>
+                    <p>This product doesn't have any videos uploaded yet.</p>
+                    <a class="btn btn-outline" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.Id">
+                        <i class="fas fa-plus-circle"></i> Add Videos
+                    </a>
+                </div>
+            </div>
+        }
+      
+       @*  <div class="loading" id="loadingState">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Loading product details...</p>
+        </div> *@
+    </div>
+
+
+    <script>
+        // Simple video controls
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.video-player video').forEach(video => {
+                const playPauseBtn = video.parentElement.querySelector('.play-pause');
+                const progressBar = video.parentElement.querySelector('.progress-bar');
+                const videoTime = video.parentElement.querySelector('.video-time');
+                const volumeBtn = video.parentElement.querySelector('.volume');
+                const fullscreenBtn = video.parentElement.querySelector('.fullscreen');
+                const progressContainer = video.parentElement.querySelector('.video-progress');
+                
+                // Play/Pause
+                playPauseBtn.addEventListener('click', () => {
+                    if (video.paused) {
+                        video.play();
+                        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    } else {
+                        video.pause();
+                        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                });
+                
+                // Update progress bar
+                video.addEventListener('timeupdate', () => {
+                    const percent = (video.currentTime / video.duration) * 100;
+                    progressBar.style.width = percent + '%';
+                    
+                    // Update time display
+                    const currentTime = formatTime(video.currentTime);
+                    const duration = formatTime(video.duration);
+                    videoTime.textContent = `${currentTime} / ${duration}`;
+                });
+                
+                // Click on progress bar to seek
+                progressContainer.addEventListener('click', (e) => {
+                    const rect = progressContainer.getBoundingClientRect();
+                    const pos = (e.clientX - rect.left) / rect.width;
+                    video.currentTime = pos * video.duration;
+                });
+                
+                // Volume toggle
+                volumeBtn.addEventListener('click', () => {
+                    video.muted = !video.muted;
+                    volumeBtn.innerHTML = video.muted ? 
+                        '<i class="fas fa-volume-mute"></i>' : 
+                        '<i class="fas fa-volume-up"></i>';
+                });
+                
+                // Fullscreen
+                fullscreenBtn.addEventListener('click', () => {
+                    if (!document.fullscreenElement) {
+                        video.parentElement.requestFullscreen();
+                    } else {
+                        document.exitFullscreen();
+                    }
+                });
+                
+                // Format time helper
+                function formatTime(seconds) {
+                    const mins = Math.floor(seconds / 60);
+                    const secs = Math.floor(seconds % 60);
+                    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+            });
+        });
+    </script>
+
+    <script src="~/admin/productdetail.js"></script>

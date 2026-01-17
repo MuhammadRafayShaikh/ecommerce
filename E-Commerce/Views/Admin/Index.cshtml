@@ -1,0 +1,144 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <h1><i class="fas fa-chart-line"></i> Business Overview</h1>
+        </div>
+
+        <div class="header-controls">
+            <div class="admin-profile">
+                <div class="admin-avatar">AS</div>
+                <div class="admin-info">
+                    <h3>@User.Identity.Name</h3>
+                    <p>@(User.IsInRole("Admin") ? "Admin" : "Employee")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-rupee-sign"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="revenue">₹4,82,560</h3>
+                <p>Total Revenue</p>
+            </div>
+            <div class="stat-change positive">
+                <i class="fas fa-arrow-up"></i> 18.5%
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="orders">1,248</h3>
+                <p>Total Orders</p>
+            </div>
+            <div class="stat-change positive">
+                <i class="fas fa-arrow-up"></i> 12.3%
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="customers">8,420</h3>
+                <p>Total Customers</p>
+            </div>
+            <div class="stat-change positive">
+                <i class="fas fa-arrow-up"></i> 7.2%
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-percentage"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="conversion">4.8%</h3>
+                <p>Conversion Rate</p>
+            </div>
+            <div class="stat-change negative">
+                <i class="fas fa-arrow-down"></i> 1.5%
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-container">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Revenue Overview</h3>
+                <div class="time-filter">
+                    <select class="filter-select">
+                        <option>Last 7 days</option>
+                        <option>Last 30 days</option>
+                        <option>Last 3 months</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Sales by Category</h3>
+                <div class="time-filter">
+                    <select class="filter-select">
+                        <option>This Month</option>
+                        <option>Last Month</option>
+                        <option>This Year</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="recent-orders">
+        <div class="section-header">
+            <h3>Recent Orders</h3>
+            <a href="#" class="view-all">
+                View All <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="table-container">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <!-- Orders will be populated here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+

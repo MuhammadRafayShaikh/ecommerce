@@ -1,0 +1,193 @@
+﻿@model E_Commerce.Models.HomeViewModel
+@{
+    List<int> productIds = TempData["cartProducts"] as List<int>;
+}
+
+<!-- Featured Hero Section -->
+<div class="featured-hero">
+    <div class="hero-content">
+        <span class="hero-badge">Featured of the Month</span>
+        <h2>Executive Collection: @Model.AttractiveDiscount.Product.Name</h2>
+        <p>@Model.AttractiveDiscount.Product.FullDescription</p>
+
+        <div class="hero-stats">
+            <div class="stat-item">
+                <div class="stat-value">150+</div>
+                <div class="stat-label">Designs</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">4.8★</div>
+                <div class="stat-label">Rating</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">5K+</div>
+                <div class="stat-label">Sold</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-image">
+        <img src="~/ProductImages/@Model.AttractiveDiscount.Product.ProductColors.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()" alt="Premium Suit">
+        <div class="hero-discount">
+            <span>@Model.AttractiveDiscount.Savings</span>
+            <span>OFF</span>
+        </div>
+    </div>
+</div>
+<!-- Spotlight Section -->
+<div class="section-header">
+    <h2>Spotlight Picks</h2>
+    <p class="section-subtitle">Our top selections this season</p>
+</div>
+
+<div class="featured-spotlight">
+    <!-- Best Sale -->
+    <div class="spotlight-card" data-product-type="bestseller">
+        <div class="spotlight-badge">Best Sale</div>
+        <div class="spotlight-image" style="background-image: url('https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');"></div>
+        <div class="spotlight-content">
+            <h3>Classic Navy Suit</h3>
+            <p>Timeless navy suit with modern tailoring for business and formal occasions.</p>
+            <div class="spotlight-meta">
+                <div class="spotlight-price">₹8,999</div>
+                <div class="spotlight-rating">
+                    <i class="fas fa-star"></i> 4.8
+                </div>
+            </div>
+            <div class="spotlight-actions">
+                <a href="#" class="spotlight-btn view">View Details</a>
+                <a href="#" class="spotlight-btn cart">Add to Cart</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Arrival -->
+    <div class="spotlight-card" data-product-type="new">
+        <div class="spotlight-badge">New Arrival</div>
+        <div class="spotlight-image" style="background-image: url('/ProductImages/@Model.NewProduct.ProductColors.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()');"></div>
+        <div class="spotlight-content">
+            <h3>@Model.NewProduct.Name</h3>
+            <p>@Model.NewProduct.ShortDescription</p>
+            <div class="spotlight-meta">
+                <div class="spotlight-price">₹@Model.NewProduct.Price</div>
+                <div class="spotlight-rating">
+                    <i class="fas fa-star"></i> 4.9
+                </div>
+            </div>
+            <div class="spotlight-actions">
+                <a href="#" class="spotlight-btn view">View Details</a>
+                <a href="#" class="spotlight-btn cart">Add to Cart</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attractive Discount -->
+    <div class="spotlight-card" data-product-type="discount">
+        <div class="spotlight-badge">@Model.AttractiveDiscount.DiscountText</div>
+        <div class="spotlight-image" style="background-image: url('/ProductImages/@Model.AttractiveDiscount.Product.ProductColors.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()');"></div>
+        <div class="spotlight-content">
+            <h3>@Model.AttractiveDiscount.Product.Name</h3>
+            <p>@Model.AttractiveDiscount.Product.ShortDescription</p>
+            <div class="spotlight-meta">
+                <div class="spotlight-price">₹@Model.AttractiveDiscount.DiscountedPrice <del style="font-size: 1rem; color: #aaa; margin-left: 5px;">₹@Model.AttractiveDiscount.OriginalPrice</del></div>
+                <div class="spotlight-rating">
+                    <i class="fas fa-star"></i> 4.7
+                </div>
+            </div>
+            <div class="spotlight-actions">
+                <a href="#" class="spotlight-btn view">View Details</a>
+                <a href="#" class="spotlight-btn cart">Add to Cart</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Latest Products Section -->
+<div class="section-header">
+    <h2>Latest Arrivals</h2>
+    <p class="section-subtitle">Fresh off the rack - newest additions to our collection</p>
+</div>
+
+<div class="featured-grid" id="latestProducts">
+    <!-- Product cards will be dynamically loaded here -->
+    <!-- Example product card structure -->
+    @if (Model.LatestProducts.Any())
+    {
+        @foreach (var products in Model.LatestProducts)
+        {
+            <div class="featured-card">
+                <div class="featured-image" style="background-image: url('/ProductImages/@products.ProductColors.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()');">
+                    <div class="featured-badge">New</div>
+                </div>
+                <div class="featured-content">
+                    <h3>@products.Name</h3>
+                    <p>@products.ShortDescription</p>
+                    <div class="featured-meta">
+                        <div class="featured-price">₹@products.Price</div>
+                        <div class="featured-rating">
+                            <i class="fas fa-star"></i> 4.8
+                        </div>
+                    </div>
+
+                    @foreach (var color in products.ProductColors)
+                    {
+                        <div class="featured-colors">
+                            <span class="color-dot"
+                                  style="background-color:@color.ColorCode" title="@color.ColorName" data-color-sizes="@color.Sizes" data-color-price="@color.ExtraPrice" data-color-id="@color.Id"></span>
+                        </div>
+                    }
+                    <div class="featured-actions">
+                        <a href="#" class="featured-btn view">View Details</a>
+                        <div class="featured-btn cart">Add to Cart</div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+<!-- Best Price Section -->
+<div class="section-header">
+    <h2>Best Value Deals</h2>
+    <p class="section-subtitle">Premium quality at unbeatable prices</p>
+</div>
+
+<div class="featured-grid" id="bestPriceProducts">
+    @if (Model.AttractiveDiscountList.Any())
+    {
+        @foreach (var products in Model.AttractiveDiscountList)
+        {
+            <div class="featured-card">
+                <div class="featured-image" style="background-image: url('/ProductImages/@products.ProductImage');">
+                    <div class="featured-badge">New</div>
+                </div>
+                <div class="featured-content">
+                    <h3>@products.Product.Name</h3>
+                    <p>@products.Product.ShortDescription</p>
+                    <div class="featured-meta">
+                        <div class="featured-price">₹@products.Product.Price</div>
+                        <div class="featured-rating">
+                            <i class="fas fa-star"></i> 4.8
+                        </div>
+                    </div>
+
+                    @foreach (var color in products.Product.ProductColors)
+                    {
+                        <div class="featured-colors">
+                            <span class="color-dot"
+                                  style="background-color:@color.ColorCode" title="@color.ColorName" data-color-sizes="@color.Sizes" data-color-price="@color.ExtraPrice" data-color-id="@color.Id"></span>
+                        </div>
+                    }
+                    <div class="featured-actions">
+                        <a href="#" class="featured-btn view">View Details</a>
+                        <div class="featured-btn cart">Add to Cart</div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@await Html.PartialAsync("_CartModal")
+
+
+<script src="~/user/modal.js"></script>

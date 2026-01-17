@@ -1,0 +1,72 @@
+﻿<link rel="stylesheet" href="~/user/modal.css"/> 
+
+<!-- Add this MODAL HTML at the end of your Collections page, before closing body tag -->
+<div id="addToCartModal" class="cart-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalProductName">Select Options</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="product-preview">
+                <div class="preview-image" id="modalProductImage"></div>
+                <div class="preview-details">
+                    <h3 id="modalProductTitle"></h3>
+                    <div class="price" id="modalProductPrice"></div>
+                    <div class="rating" id="modalProductRating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>(4.5)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="selection-section">
+                <!-- Colors Selection -->
+                <div class="color-selection">
+                    <h3>Select Color(s) <span class="selection-hint">(You can select multiple colors)</span></h3>
+                    <div class="color-options" id="modalColorOptions">
+                        <!-- Colors will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- Sizes Selection (will be shown when a color is selected) -->
+                <div class="size-selection" id="sizeSelection" style="display: none;">
+                    <h3>Select Sizes for Each Color</h3>
+                    <div class="size-container" id="sizeContainer">
+                        <!-- Size options will be dynamically added here based on selected colors -->
+                    </div>
+                </div>
+
+                <!-- Quantity Selection -->
+                <div class="quantity-selection">
+                    <h3>Quantity for Each Selection</h3>
+                    <div class="selection-summary" id="selectionSummary">
+                        <!-- Summary of selections will be shown here -->
+                        <p class="no-selection">No colors selected yet. Please select at least one color to proceed.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="total-section">
+                <span>Total:</span>
+                <span class="total-price" id="modalTotalPrice">₹0</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-continue">Continue Shopping</button>
+                <button class="btn-add-to-cart" id="addToCartConfirm" disabled>
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+ @* <script src="~/user/modal.js"></script> *@

@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "Premium gents Suits";
+    Layout = "_Layout";
+}
+@model E_Commerce.Models.Collections
+@section Styles {
+    <link rel="stylesheet" href="~/user/collections.css" asp-append-version="true">
+}
+
+
+<div class="collections-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Our Exclusive Collections</h1>
+        <p>Discover our curated selection of premium gents suits, each crafted with precision and designed for elegance. From traditional to contemporary, find the perfect suit for every occasion.</p>
+    </div>
+
+    <!-- Collections Categories -->
+    <div class="collections-categories">
+        <h2 class="categories-title">Browse by Category</h2>
+        <div class="categories-grid">
+            <a style="text-decoration:none;" asp-controller="Home" asp-action="Collections" asp-route-id=""><div class="category-tag @(ViewData["categoryId"] == null || (int)ViewData["categoryId"] == 0 ? "active" : "")">All Collections</div></a>
+            @foreach (var category in Model.Categories)
+            {
+
+                <a style="text-decoration:none;" asp-controller="Home" asp-action="Collections" asp-route-id="@category.Id"><div class="category-tag @((int)ViewData["categoryId"] == category.Id ? "active" : "")" data-category-id="@category.Id">@category.Name</div></a>
+            }
+
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div id="filter-section">
+    @await Html.PartialAsync("~/Views/Home/CollectionsPartial/_FiltersSection.cshtml")
+    </div>
+    
+
+
+    <!-- Collections Grid -->
+    <div class="collections-grid" id="collectionsGrid">
+
+
+        <!-- Collection Item 3 -->
+        @await Html.PartialAsync("~/Views/Home/CollectionsPartial/_CollectionsCard.cshtml")
+
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <a href="#" class="prev"><i class="fas fa-chevron-left"></i> Previous</a>
+        <a href="#" class="active">1</a>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#">4</a>
+        <a href="#">5</a>
+        <a href="#" class="next">Next <i class="fas fa-chevron-right"></i></a>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/user/collections.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,357 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fef7f9;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+    background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.left-panel {
+    flex: 1;
+    background: linear-gradient(135deg, #ff7eb3, #ff758c);
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+    .left-panel::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1974&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        opacity: 0.15;
+    }
+
+.logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+    .logo span {
+        color: #ffebf1;
+    }
+
+.tagline {
+    font-size: 18px;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+    line-height: 1.5;
+}
+
+.features {
+    list-style: none;
+    position: relative;
+    z-index: 1;
+}
+
+    .features li {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .features i {
+        margin-right: 12px;
+        font-size: 20px;
+        color: #ffebf1;
+    }
+
+.right-panel {
+    flex: 1.2;
+    padding: 50px 40px;
+    background-color: white;
+}
+
+.form-header {
+    margin-bottom: 30px;
+}
+
+    .form-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 32px;
+        color: #d63384;
+        margin-bottom: 10px;
+    }
+
+    .form-header p {
+        color: #666;
+        font-size: 15px;
+    }
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    flex: 1;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #e6e6e6;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+}
+
+    input:focus {
+        outline: none;
+        border-color: #ff7eb3;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(255, 126, 179, 0.1);
+    }
+
+.password-container {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+}
+
+.terms {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 25px;
+}
+
+    .terms input {
+        width: auto;
+        margin-right: 10px;
+        margin-top: 4px;
+    }
+
+    .terms label {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .terms a {
+        color: #d63384;
+        text-decoration: none;
+    }
+
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(to right, #ff7eb3, #ff758c);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+}
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 126, 179, 0.3);
+    }
+
+.divider {
+    text-align: center;
+    margin: 25px 0;
+    position: relative;
+    color: #999;
+}
+
+    .divider::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 45%;
+        height: 1px;
+        background-color: #eee;
+    }
+
+    .divider::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 0;
+        width: 45%;
+        height: 1px;
+        background-color: #eee;
+    }
+
+.google-signup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    padding: 14px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #444;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    margin-bottom: 30px;
+}
+
+    .google-signup:hover {
+        background-color: #f9f9f9;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+.google-icon {
+    font-size: 22px;
+    font-weight: 700;
+    display: flex;
+    gap: 2px;
+}
+
+.letter-g {
+    color: #4285F4;
+}
+
+.letter-o1 {
+    color: #EA4335;
+}
+
+.letter-o2 {
+    color: #FBBC05;
+}
+
+.letter-g2 {
+    color: #4285F4;
+}
+
+.letter-l {
+    color: #34A853;
+}
+
+.letter-e {
+    color: #EA4335;
+}
+
+.login-link {
+    text-align: center;
+    color: #666;
+    font-size: 15px;
+}
+
+    .login-link a {
+        color: #d63384;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .container {
+        flex-direction: column;
+        max-width: 600px;
+    }
+
+    .left-panel {
+        padding: 40px 30px;
+    }
+
+    .right-panel {
+        padding: 40px 30px;
+    }
+}
+
+@media (max-width: 576px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .left-panel, .right-panel {
+        padding: 30px 20px;
+    }
+
+    .form-header h1 {
+        font-size: 28px;
+    }
+}
+
+/* Error styling */
+.error {
+    color: #ff3860;
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+}
+
+.input-error {
+    border-color: #ff3860;
+}
+
+/* Success message */
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none;
+}

@@ -1,0 +1,145 @@
+﻿@{
+    ViewData["Title"] = "Sale - Exclusive Deals";
+    Layout = "_Layout";
+}
+@model E_Commerce.Models.SalesViewModel
+
+@section Styles {
+    <link rel="stylesheet" href="~/user/sales/sales.css" asp-append-version="true">
+}
+
+<div class="sales-container">
+    <!-- Hero Banner -->
+    <div class="sales-hero">
+        <div class="hero-overlay">
+            <div class="hero-content">
+                <h1 class="hero-title">End of Season Sale</h1>
+                <p class="hero-subtitle">Up to 70% OFF on Premium Suits</p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">@Model.ProductCount</span>
+                        <span class="stat-label">Products on Sale</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">₹@Model.TotalSavings.ToString("N0")</span>
+                        <span class="stat-label">Total Savings</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">@Model.DiscountGroups.Count</span>
+                        <span class="stat-label">Discount Tiers</span>
+                    </div>
+                </div>
+                <p class="hero-timer" id="saleTimer">Sale ends in: <span id="countdown">07:00:00:00</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discount Filter Tabs -->
+    <div class="discount-tabs">
+        <div class="tabs-container">
+            <button class="tab-btn active" data-filter="all">All Discounts</button>
+            @foreach (var group in Model.DiscountGroups)
+            {
+                <button class="tab-btn" data-filter="@group">@group</button>
+            }
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="sales-products-grid" id="productsGrid">
+        @foreach (var discount in Model.Discounts)
+        {
+            var product = discount.Product;
+            var originalPrice = product.Price;
+            var discountedPrice = discount.DiscountedPrice;
+            var discountText = discount.DiscountType == Discount._Type.Percentage ?
+            $"{discount.DiscountValue}% OFF" :
+            $"₹{discount.DiscountValue} OFF";
+            var discountGroup = discount.DiscountType == Discount._Type.Percentage ?
+            $"{(int)discount.DiscountValue}% OFF" :
+            $"₹{(int)discount.DiscountValue} OFF";
+
+            <div class="sale-product-card" data-discount-group="@discountGroup">
+                <div class="product-badge-container">
+                    <span class="discount-badge">@discountText</span>
+                    @if (discount.DiscountValue >= 50)
+                    {
+                        <span class="hot-badge">HOT</span>
+                    }
+                </div>
+
+                <div class="product-image">
+                    <img src="/ProductImages/@product.ProductColors.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()"
+                         alt="@product.Name"
+                         onerror="this.src='https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'">
+                    <div class="image-overlay">
+                        <button class="quick-view" data-product-id="@product.Id">Quick View</button>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <h3 class="product-title">@product.Name</h3>
+                    <p class="product-description">@product.ShortDescription</p>
+
+                    <div class="price-section">
+                        <div class="original-price">₹@originalPrice.ToString("N2")</div>
+                        <div class="discounted-price">₹@discountedPrice.ToString("N2")</div>
+                        <div class="savings">Save ₹@((originalPrice - discountedPrice).ToString("N2"))</div>
+                    </div>
+
+                    <div class="product-colors">
+                        @foreach (var color in product.ProductColors.Take(4))
+                        {
+                            <span class="color-dot" style="background-color: @color.ColorCode"
+                                  title="@color.ColorName"></span>
+                        }
+                        @if (product.ProductColors.Count > 4)
+                        {
+                            <span class="more-colors">+@(product.ProductColors.Count - 4)</span>
+                        }
+                    </div>
+
+                    <div class="product-actions">
+                        <a asp-controller="Detail" asp-action="Index" asp-route-id="@product.Id"
+                           class="view-details-btn">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                        <button class="add-to-cart-btn" data-product-id="@product.Id">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Empty State (if no products on sale) -->
+    @if (!Model.Discounts.Any())
+    {
+        <div class="empty-sales">
+            <div class="empty-icon">
+                <i class="fas fa-tag"></i>
+            </div>
+            <h2>No Active Sales</h2>
+            <p>Currently, there are no products on sale. Check back soon for amazing deals!</p>
+            <a asp-controller="Home" asp-action="Collections" class="shop-now-btn">Browse Collections</a>
+        </div>
+    }
+
+    <!-- Call to Action -->
+    <div class="sale-cta">
+        <div class="cta-content">
+            <h2>Don't Miss Out on These Deals!</h2>
+            <p>Sign up to get notified about flash sales and exclusive member-only discounts.</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Enter your email" required>
+                <button type="submit">Get Sale Alerts</button>
+            </form>
+            <p class="cta-note"><i class="fas fa-shield-alt"></i> We never share your email with third parties.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/user/sales/sales.js" asp-append-version="true"></script>
+}

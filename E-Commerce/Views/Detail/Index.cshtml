@@ -1,0 +1,495 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model E_Commerce.Models.Product
+<link rel="stylesheet" href="~/user/detail/detail.css" asp-append-version="true">
+<!-- Product Detail Page -->
+<div class="product-detail-container">
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb">
+        <a href="/">Home</a>
+        <span class="separator">/</span>
+        <a href="/collections">Collections</a>
+        <span class="separator">/</span>
+        <a href="#">@Model.Category?.Name</a>
+        <span class="separator">/</span>
+        <span>@Model.Name</span>
+    </div>
+
+    <!-- Product Layout -->
+    <div class="product-layout">
+        <!-- Product Images -->
+        <div class="product-images">
+            <div class="main-image-container">
+                <img id="mainImage" class="main-image"
+                     src="/ProductImages/@Model.ProductColors.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()"
+                     alt="@Model.Name">
+            </div>
+
+            <div class="image-thumbnails" id="imageThumbnails">
+                @{
+                    var allImages = Model.ProductColors.SelectMany(x => x.Images).ToList();
+                    var primaryImage = allImages.FirstOrDefault(x => x.IsPrimary);
+                }
+
+                @if (primaryImage != null)
+                {
+                    <div class="thumbnail active" data-image="/ProductImages/@primaryImage.ImagePath">
+                        <img src="/ProductImages/@primaryImage.ImagePath" alt="Thumbnail">
+                    </div>
+                }
+
+                @foreach (var image in allImages.Where(x => !x.IsPrimary).Take(5))
+                {
+                    <div class="thumbnail" data-image="/ProductImages/@image.ImagePath">
+                        <img src="/ProductImages/@image.ImagePath" alt="Thumbnail">
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="product-info">
+            <div class="product-title">
+                <h1>@Model.Name</h1>
+                <div class="product-sku">SKU: @Model.SKU</div>
+            </div>
+
+            <div class="product-rating">
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+                <div class="rating-count">(4.5 • 128 Reviews)</div>
+            </div>
+
+            <div class="product-price">
+                <span class="current-price">₹@Model.Price.ToString("0")</span>
+                @* @if (Model.Discount != null)
+                {
+                <span class="original-price">₹@((Model.Price + (Model.Price * Model.Discount.Percentage / 100)).ToString("0"))</span>
+                <span class="discount-badge">@Model.Discount.Percentage% OFF</span>
+                } *@
+            </div>
+
+            <div class="product-short-desc">
+                @Model.ShortDescription
+            </div>
+
+            <!-- Color Selection -->
+            <!-- Size Selection ke baad: -->
+<!-- Color Selection -->
+<div class="color-selection">
+    <h3>Select Color</h3>
+    <div class="color-options" id="colorOptions">
+        @foreach (var color in Model.ProductColors)
+        {
+            <div class="color-option @(color == Model.ProductColors.First() ? "selected" : "")"
+                 style="background-color: @color.ColorCode"
+                 data-color-id="@color.Id"
+                 data-color-name="@color.ColorName"
+                 data-color-price="@color.ExtraPrice"
+                 data-sizes="@color.Sizes"
+                 data-stock="@color.Stock">
+                <div class="color-name-tooltip">@color.ColorName</div>
+            </div>
+        }
+    </div>
+</div>
+
+            <!-- Size Selection -->
+            <div class="size-selection">
+                <h3>Select Size</h3>
+                <div class="size-options" id="sizeOptions">
+                    <!-- Sizes will be populated dynamically based on selected color -->
+                    @{
+                        var firstColor = Model.ProductColors.FirstOrDefault();
+                        var sizes = firstColor?.Sizes?.Split(',') ?? new string[0];
+                    }
+                    @foreach (var size in sizes)
+                    {
+                        <div class="size-option @(size == sizes.First() ? "selected" : "")" data-size="@size.Trim()">
+                            @size.Trim()
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Quantity Selection -->
+            <div class="quantity-selection">
+                <h3>Quantity</h3>
+                <div class="quantity-control">
+                    <button class="quantity-btn minus">-</button>
+                    <input type="number" class="quantity-input" value="1" min="1" max="10">
+                    <button class="quantity-btn plus">+</button>
+                </div>
+                <div class="stock-status">
+                    @{
+                        var totalStock = Model.ProductColors.Sum(c => c.Stock);
+                        var stockStatus = totalStock > 10 ? "in-stock" : "low-stock";
+                        var stockText = totalStock > 10 ? $"{totalStock} items in stock" : $"Only {totalStock} items left";
+                    }
+                    <span class="@stockStatus">@stockText</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn-add-to-cart cart-btn" data-product-id="@Model.Id" id="addToCartBtn">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+                <a href="/Cart/Index" class="view-cart" data-product-id="@Model.Id" style="text-decoration:none; display:none;">
+                    <div class="btn-add-to-cart">
+                        <i class="fas fa-shopping-cart"></i> View Cart
+                    </div>
+                </a>
+                
+
+                <button class="btn-buy-now" id="buyNowBtn">
+                    <i class="fas fa-bolt"></i> Buy Now
+                </button>
+                <button class="btn-wishlist" id="wishlistBtn">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+           
+            <!-- Product Meta Info -->
+            <div class="product-meta">
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div class="meta-text">
+                        <h4>Free Shipping</h4>
+                        <p>On orders above ₹1999</p>
+                    </div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <i class="fas fa-undo-alt"></i>
+                    </div>
+                    <div class="meta-text">
+                        <h4>Easy Returns</h4>
+                        <p>15 Days Return Policy</p>
+                    </div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="meta-text">
+                        <h4>Secure Payment</h4>
+                        <p>100% Secure & Safe</p>
+                    </div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="meta-text">
+                        <h4>Customer Support</h4>
+                        <p>24/7 Dedicated Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Tabs -->
+    <div class="product-tabs">
+        <div class="tab-headers">
+            <div class="tab-header active" data-tab="description">Description</div>
+            <div class="tab-header" data-tab="details">Product Details</div>
+            <div class="tab-header" data-tab="reviews">Reviews (128)</div>
+            <div class="tab-header" data-tab="shipping">Shipping & Returns</div>
+        </div>
+
+        <!-- Description Tab -->
+        <div class="tab-content active" id="description">
+            <div class="description-content">
+                @Html.Raw(Model.FullDescription)
+
+                <h3>Fabric & Care</h3>
+                <p><strong>Fabric:</strong> @Model.Fabric</p>
+                <p><strong>Care Instructions:</strong> @Model.CareInstruction</p>
+
+                <h3>Perfect For</h3>
+                <p>@Model.Occasion</p>
+
+                <h3>Product Specifications</h3>
+                <ul>
+                    <li><strong>Weight:</strong> @Model.Weight grams</li>
+                    <li><strong>Brand:</strong> @Model.Brand</li>
+                    <li><strong>Category:</strong> @Model.Category?.Name</li>
+                    <li><strong>Availability:</strong> @Model.Availability</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Details Tab -->
+        <div class="tab-content" id="details">
+            <div class="details-list">
+                <div class="detail-item">
+                    <h4>Material & Fabric</h4>
+                    <p>@Model.Fabric</p>
+                </div>
+
+                <div class="detail-item">
+                    <h4>Care Instructions</h4>
+                    <p>@Model.CareInstruction</p>
+                </div>
+
+                <div class="detail-item">
+                    <h4>Occasion</h4>
+                    <p>@Model.Occasion</p>
+                </div>
+
+                <div class="detail-item">
+                    <h4>Brand</h4>
+                    <p>@Model.Brand</p>
+                </div>
+
+                <div class="detail-item">
+                    <h4>Weight</h4>
+                    <p>@Model.Weight grams</p>
+                </div>
+
+                <div class="detail-item">
+                    <h4>SKU</h4>
+                    <p>@Model.SKU</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Tab -->
+        <div class="tab-content" id="reviews">
+            <div class="reviews-summary">
+                <div class="overall-rating">
+                    <div class="rating-number">4.5</div>
+                    <div class="rating-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="rating-count">Based on 128 reviews</div>
+                </div>
+
+                <div class="rating-bars">
+                    <div class="rating-bar">
+                        <div class="bar-label">5 stars</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 70%"></div>
+                        </div>
+                        <div class="bar-percent">70%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="bar-label">4 stars</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 20%"></div>
+                        </div>
+                        <div class="bar-percent">20%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="bar-label">3 stars</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 7%"></div>
+                        </div>
+                        <div class="bar-percent">7%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="bar-label">2 stars</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 2%"></div>
+                        </div>
+                        <div class="bar-percent">2%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="bar-label">1 star</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 1%"></div>
+                        </div>
+                        <div class="bar-percent">1%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sample Reviews -->
+            <div class="review-list">
+                <!-- In a real application, you would loop through actual reviews here -->
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="reviewer">Priya Sharma</div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="review-date">2 weeks ago</div>
+                    </div>
+                    <div class="review-content">
+                        <p>Absolutely love this suit! The fabric is so comfortable and the embroidery is stunning. Perfect for weddings.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipping Tab -->
+        <div class="tab-content" id="shipping">
+            <div class="description-content">
+                <h3>Shipping Information</h3>
+                <ul>
+                    <li>Free standard shipping on orders above ₹1999</li>
+                    <li>Express shipping available at extra charge</li>
+                    <li>Orders are processed within 24-48 hours</li>
+                    <li>Estimated delivery time: 3-7 business days</li>
+                    <li>We ship to all major cities in India</li>
+                </ul>
+
+                <h3>Return Policy</h3>
+                <ul>
+                    <li>15-day return policy from the date of delivery</li>
+                    <li>Items must be unused, unwashed, and with original tags</li>
+                    <li>Return shipping is free for defective or wrong items</li>
+                    <li>Refunds are processed within 5-7 business days</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-products">
+        <div class="section-title">
+            <h2>You May Also Like</h2>
+            <p>Discover more beautiful suits from our collection</p>
+        </div>
+
+        <div class="products-grid">
+            <!-- Related products would be populated dynamically -->
+            <div class="product-card">
+                <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
+                    <div class="product-badge">Bestseller</div>
+                </div>
+                <div class="product-content">
+                    <h3>Blue Embroidered Anarkali</h3>
+                    <div class="product-price">₹3,499</div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1572804013427-4d7ca7268217?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
+                    <div class="product-badge">New</div>
+                </div>
+                <div class="product-content">
+                    <h3>Pink Floral Palazzo Set</h3>
+                    <div class="product-price">₹2,999</div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1585487000160-6eb9ce6b5aae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
+                    <div class="product-badge">Sale</div>
+                </div>
+                <div class="product-content">
+                    <h3>Green Silk Sharara</h3>
+                    <div class="product-price">₹4,499</div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1566174053879-31528523f8ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
+                    <div class="product-badge">Limited</div>
+                </div>
+                <div class="product-content">
+                    <h3>Maroon Embroidered Suit</h3>
+                    <div class="product-price">₹5,999</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="addToCartModal" class="cart-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalProductName">Select Options</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="product-preview">
+                <div class="preview-image" id="modalProductImage"></div>
+                <div class="preview-details">
+                    <h3 id="modalProductTitle"></h3>
+                    <div class="price" id="modalProductPrice"></div>
+                    <div class="rating" id="modalProductRating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>(4.5)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="selection-section">
+                <!-- Colors Selection -->
+                <div class="color-selection">
+                    <h3>Select Color(s) <span class="selection-hint">(You can select multiple colors)</span></h3>
+                    <div class="color-options" id="modalColorOptions">
+                        <!-- Colors will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- Sizes Selection (will be shown when a color is selected) -->
+                <div class="size-selection" id="sizeSelection" style="display: none;">
+                    <h3>Select Sizes for Each Color</h3>
+                    <div class="size-container" id="sizeContainer">
+                        <!-- Size options will be dynamically added here based on selected colors -->
+                    </div>
+                </div>
+
+                <!-- Quantity Selection -->
+                <div class="quantity-selection">
+                    <h3>Quantity for Each Selection</h3>
+                    <div class="selection-summary" id="selectionSummary">
+                        <!-- Summary of selections will be shown here -->
+                        <p class="no-selection">No colors selected yet. Please select at least one color to proceed.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="total-section">
+                <span>Total:</span>
+                <span class="total-price" id="modalTotalPrice">₹0</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-continue">Continue Shopping</button>
+                <button class="btn-add-to-cart" id="addToCartConfirm" disabled>
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Hidden element to store the AJAX URL -->
+<input type="hidden" id="getColorDataUrl" value="@Url.Action("GetColorData", "Detail")" />
+
+<!-- Custom Notification Toast -->
+@await Html.PartialAsync("_Confirmation")
+@await Html.PartialAsync("_Toast")
+
+<script src="~/user/modal.js"></script>
+<script src="~/user/detail/detail.js"></script>

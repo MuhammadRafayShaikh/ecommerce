@@ -1,0 +1,382 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "My Shopping Cart";
+}
+@model List<E_Commerce.Models.CartItem>
+
+<!-- Cart Page Content -->
+<div class="cart-container" style="margin-top: 80px;">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-shopping-bag"></i> My Shopping Bag</h1>
+        <p>Review your items and proceed to checkout</p>
+    </div>
+
+    @if (Model.Any())
+    {
+        <!-- Cart Content -->
+        <div class="cart-content" id="cartContent">
+            <!-- Cart Items Section -->
+            <div class="cart-items-section">
+                <div class="cart-items-header">
+                    <h2>Cart Items</h2>
+                    <div class="cart-items-count" id="cartCount">@Model.Sum(x => x.Quantity) Items</div>
+                </div>
+
+                <div class="cart-items-list" id="cartItemsList">
+                    <!-- Group items by Product -->
+                    @{
+                        var productGroups = Model.GroupBy(x => x.Product);
+                        decimal? totalSavings = 0;
+                    }
+
+                    @foreach (var group in productGroups)
+                    {
+                        var product = group.Key;
+                        var productItems = group.ToList();
+
+                        // Calculate discount if exists
+                        decimal originalBasePrice = product.Price;
+                        decimal discountValue = product.Discount?.DiscountValue ?? 0m; // CHANGE: 'm' lagayein
+                        int discountType = (int)(product.Discount?.DiscountType ?? 0); // CHANGE: int me convert
+                        decimal discountedBasePrice = originalBasePrice;
+
+                        if (product.Discount != null)
+                        {
+                            if (product.Discount.DiscountType == E_Commerce.Models.Discount._Type.Percentage)
+                            {
+                                discountedBasePrice = originalBasePrice - (originalBasePrice * discountValue / 100);
+                            }
+                            else if (product.Discount.DiscountType == E_Commerce.Models.Discount._Type.Fixed)
+                            {
+                                discountedBasePrice = originalBasePrice - discountValue;
+                            }
+                        }
+
+                        decimal? totalProductPrice = 0;
+                        decimal? totalOriginalProductPrice = 0;
+
+                        <div class="cart-item" data-product-id="@product.Id">
+                            <!-- Product Image -->
+                            <div class="cart-item-img"
+                                 style="background-image: url('/ProductImages/@product.ProductColors.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()');">
+                                @if (product.Discount != null)
+                                {
+                                    <div class="discount-badge">
+                                        @if (product.Discount.DiscountType == E_Commerce.Models.Discount._Type.Percentage)
+                                        {
+                                            <span>@product.Discount.DiscountValue% OFF</span>
+                                        }
+                                        else
+                                        {
+                                            <span>₹@product.Discount.DiscountValue OFF</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="cart-item-details">
+                                <h3>@product.Name</h3>
+                                <p>@product.ShortDescription</p>
+
+                                <!-- Selected Colors and Sizes Summary -->
+                                <div class="item-selections-summary">
+                                    @{
+                                        var colorGroups = productItems.GroupBy(x => x.ProductColor);
+                                    }
+
+                                    @foreach (var colorGroup in colorGroups)
+                                    {
+                                        var color = colorGroup.Key;
+                                        var sizeGroups = colorGroup.GroupBy(x => x.Size);
+
+                                        <div class="selection-group" data-color-id="@color.Id">
+                                            <div class="color-indicator">
+                                                <span class="color-dot-small" style="background-color: @color.ColorCode"></span>
+                                                <span>@color.ColorName:</span>
+                                                @if (color.ExtraPrice > 0)
+                                                {
+                                                    <span class="extra-price-indicator">+₹@color.ExtraPrice</span>
+                                                }
+                                            </div>
+
+                                            @foreach (var sizeGroup in sizeGroups)
+                                            {
+                                                var size = sizeGroup.Key;
+                                                var quantity = sizeGroup.Sum(x => x.Quantity);
+                                                var itemUnitPrice = discountedBasePrice + color.ExtraPrice;
+                                                var itemOriginalPrice = originalBasePrice + color.ExtraPrice;
+
+                                                totalProductPrice += itemUnitPrice * quantity;
+                                                totalOriginalProductPrice += itemOriginalPrice * quantity;
+
+                                                <div class="size-item">
+                                                    <span class="size-badge">@size</span>
+                                                    <span class="quantity-badge">×@quantity</span>
+                                                    @if (product.Discount != null)
+                                                    {
+                                                        <span class="item-price">
+                                                            <!-- CHANGE: string.Format use karein -->
+                                                            ₹@string.Format("{0:N0}", itemUnitPrice * quantity)
+                                                        </span>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- View Details Button -->
+                                <div class="view-details-btn-container">
+                                    <button class="view-details-btn"
+                                            data-product-id="@product.Id"
+                                            onclick="openEditModal('@product.Id')">
+                                        <i class="fas fa-edit"></i> Edit Selections
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Quantity Display (Not editable) -->
+                            <div class="cart-item-quantity-display">
+                                <div class="quantity-display">
+                                    <span class="quantity-label">Total Qty:</span>
+                                    <span class="quantity-value">@productItems.Sum(x => x.Quantity)</span>
+                                </div>
+                            </div>
+
+                            <!-- Price -->
+                            <div class="cart-item-price">
+                                @if (product.Discount != null)
+                                {
+                                    decimal? totalSavingsForProduct = totalOriginalProductPrice - totalProductPrice;
+                                    totalSavings += totalSavingsForProduct;
+
+                                    <div class="original-price" style="text-decoration: line-through; color: #999; font-size: 14px;">
+                                        ₹@string.Format("{0:N0}", totalOriginalProductPrice)
+                                    </div>
+                                    <div class="current-price" style="color: #e53935; font-weight: bold;">
+                                        ₹@string.Format("{0:N0}", totalProductPrice)
+                                    </div>
+                                    <div class="savings" style="font-size: 12px; color: #4CAF50;">
+                                        You save ₹@string.Format("{0:N0}", totalSavingsForProduct)
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="current-price">₹@string.Format("{0:N0}", totalProductPrice)</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="cart-actions">
+                    <a href="/Collections" class="continue-shopping">
+                        <i class="fas fa-arrow-left"></i> Continue Shopping
+                    </a>
+                    <button class="clear-cart" onclick="clearCart()">
+                        <i class="fas fa-trash-alt"></i> Clear Cart
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="cart-summary">
+                <h2>Order Summary</h2>
+
+                @{
+                    // Calculate with discount if applicable
+                    var subtotal = Model.Sum(item =>
+                    {
+                        var product = item.Product;
+                        var color = item.ProductColor;
+                        var extraPrice = color?.ExtraPrice ?? 0;
+
+                        // Calculate unit price with discount
+                        decimal unitPrice = product.Price + extraPrice;
+                        if (product.Discount != null)
+                        {
+                            if (product.Discount.DiscountType == E_Commerce.Models.Discount._Type.Percentage)
+                            {
+                                unitPrice = (product.Price - (product.Price * product.Discount.DiscountValue / 100)) + extraPrice;
+                            }
+                            else if (product.Discount.DiscountType == E_Commerce.Models.Discount._Type.Fixed)
+                            {
+                                unitPrice = (product.Price - product.Discount.DiscountValue) + extraPrice;
+                            }
+                        }
+                        return unitPrice * item.Quantity;
+                    });
+
+                    // Calculate original price without discount for savings
+                    var originalSubtotal = Model.Sum(item =>
+                    {
+                        var product = item.Product;
+                        var color = item.ProductColor;
+                        var extraPrice = color?.ExtraPrice ?? 0;
+                        return (product.Price + extraPrice) * item.Quantity;
+                    });
+
+                    var totalSavingsAmount = originalSubtotal - subtotal;
+                    var delivery = 99M;
+                    var tax = subtotal * 0.12M;
+                    var discount = 0M; // Additional discount from coupons
+                    var total = subtotal + delivery + tax - discount;
+                }
+
+                @if (totalSavingsAmount > 0)
+                {
+                    <div class="summary-row savings-row">
+                        <span>Total Savings</span>
+                        <span class="value" style="color: #4CAF50; font-weight: bold;">
+                            -₹<span id="totalSavings">@string.Format("{0:N0}", totalSavingsAmount)</span>
+                        </span>
+                    </div>
+                }
+
+                <div class="summary-row">
+                    <span>Subtotal (@Model.Sum(x => x.Quantity) items)</span>
+                    <span class="value">₹<span id="subtotal">@string.Format("{0:N0}", subtotal)</span></span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Delivery Charges</span>
+                    <span class="value">₹<span id="delivery">@string.Format("{0:N0}", delivery)</span></span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Tax (GST 12%)</span>
+                    <span class="value">₹<span id="tax">@string.Format("{0:N0}", tax)</span></span>
+                </div>
+
+                @if (discount > 0)
+                {
+                    <div class="summary-row">
+                        <span>Coupon Discount</span>
+                        <span class="value" style="color: #4CAF50;">-₹<span id="discount">@string.Format("{0:N0}", discount)</span></span>
+                    </div>
+                }
+
+                <div class="summary-row total">
+                    <span>Total Amount</span>
+                    <span class="value">₹<span id="total">@string.Format("{0:N0}", total)</span></span>
+                </div>
+
+                <div class="discount-code">
+                    <h3>Apply Discount Code</h3>
+                    <div class="discount-input">
+                        <input type="text" placeholder="Enter coupon code" id="couponCode">
+                        <button onclick="applyCoupon()">Apply</button>
+                    </div>
+                </div>
+
+                <button class="checkout-btn" onclick="proceedToCheckout()">
+                    <i class="fas fa-lock"></i> Proceed to Checkout
+                </button>
+
+                <div class="secure-checkout">
+                    <i class="fas fa-shield-alt"></i> Secure checkout • Your information is safe
+                </div>
+            </div>
+        </div>
+    }
+    else if (!User.Identity.IsAuthenticated)
+    {
+        <div class="empty-cart" id="emptyCart">
+            <i class="fas fa-shopping-bag"></i>
+            <h3>You are not logged in</h3>
+            <p>Looks like you haven't logged in yet. Start shopping to fill your bag with beautiful products!</p>
+            <a asp-controller="Account" asp-action="Login" class="shop-now-btn">Click here to login</a>
+        </div>
+    }
+    else
+    {
+        <!-- Empty Cart State -->
+        <div class="empty-cart" id="emptyCart">
+            <i class="fas fa-shopping-bag"></i>
+            <h3>Your Shopping Bag is Empty</h3>
+            <p>Looks like you haven't added any items to your cart yet. Start shopping to fill your bag with beautiful products!</p>
+            <a href="/Collections" class="shop-now-btn">Start Shopping</a>
+        </div>
+    }
+</div>
+
+<!-- Edit Cart Item Modal -->
+<div id="editCartModal" class="cart-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="editProductName">Edit Selections</h2>
+            <button class="close-edit-modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Product Preview -->
+            <div class="product-preview">
+                <div class="preview-image" id="editProductImage"></div>
+                <div class="preview-details">
+                    <h3 id="editProductTitle"></h3>
+                    <div class="price" id="editProductPrice"></div>
+                    <!-- CHANGE: Discount tag ko JS ke through handle karein -->
+                    <div id="editDiscountTag"></div>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>(4.5)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="selection-section">
+                <!-- Colors Selection -->
+                <div class="color-selection">
+                    <h3>Select Colors <span class="selection-hint">(You can select/deselect colors)</span></h3>
+                    <div class="color-options" id="editColorOptions">
+                        <!-- Colors will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- Sizes Selection -->
+                <div class="size-selection" id="editSizeSelection" style="display: none;">
+                    <h3>Select Sizes for Each Color</h3>
+                    <div class="size-container" id="editSizeContainer">
+                        <!-- Size options will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- Current Selections Summary -->
+                <div class="quantity-selection">
+                    <h3>Your Current Selections</h3>
+                    <div class="selection-summary" id="editSelectionSummary">
+                        <!-- Summary of selections will be shown here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="total-section">
+                <span>Total:</span>
+                <span class="total-price" id="editTotalPrice">₹0</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-continue">Cancel</button>
+                <button class="btn-update-cart" id="updateCartBtn">
+                    <i class="fas fa-save"></i> Update Cart
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Confirmation Modal -->
+@await Html.PartialAsync("_Confirmation")
+
+<!-- Custom Notification Toast -->
+@await Html.PartialAsync("_Toast")
+
+<script src="~/user/cart.js"></script>

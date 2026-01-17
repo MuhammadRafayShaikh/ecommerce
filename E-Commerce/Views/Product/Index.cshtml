@@ -1,0 +1,240 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+@model List<E_Commerce.Models.Product>
+<style>
+    .btn-active {
+        color: green;
+    }
+
+    .btn-inactive {
+        color: var(--warning);
+    }
+
+    .btn-active:hover {
+        background-color: var(--warning);
+        color: white;
+        transform: translateY(-3px);
+    }
+
+    .btn-inactive:hover {
+        background-color: var(--success);
+        color: white;
+        transform: translateY(-3px);
+    }
+</style>
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Header -->
+    @await Html.PartialAsync("_AdminProductHeader")
+    <div class="page-container" id="viewProductsPage">
+        <div class="quick-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalProductsCount">@ViewData["totalProducts"]</h3>
+                    <p>Total Products</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="activeProductsCount">@ViewData["activeProducts"]</h3>
+                    <p>Active Products</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="inStockCount">@ViewData["inStockProducts"]</h3>
+                    <p>In Stock</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalInventoryValue">₹2,84,500</h3>
+                    <p>Inventory Value</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="products-table-container">
+            <div class="table-header">
+                <h2><i class="fas fa-list"></i> All Products</h2>
+                <div class="table-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="productSearch" placeholder="Search products..." onkeyup="searchProducts()">
+                    </div>
+                    <select class="filter-select" id="categoryFilter" onchange="filterProducts()">
+                        <option value="">All Categories</option>
+                        <option value="Anarkali Suits">Anarkali Suits</option>
+                        <option value="Lehenga Choli">Lehenga Choli</option>
+                        <option value="Sharara Suits">Sharara Suits</option>
+                        <option value="Palazzo Suits">Palazzo Suits</option>
+                    </select>
+                    <select class="filter-select" id="statusFilter" onchange="filterProducts()">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>SKU</th>
+                                @* <th>Stock</th> *@
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var products in Model)
+                            {
+                                // Determine stock indicator
+                                @* string stockClass = "stock-out";
+                        string stockText = "Out of Stock";
+
+                        if (products.stock > 10)
+                        {
+                        stockClass = 'stock-in';
+                        stockText = `${ product.stock} in stock`;
+                        }
+                        else if (product.stock > 0)
+                        {
+                        stockClass = 'stock-low';
+                        stockText = `Low stock(${ product.stock})`;
+                        } *@
+                                <tr>
+                                    <td>
+                                        <div class="product-image-cell">
+                                            <img src="~/ProductImages/@products.ProductColors.SelectMany(x => x.Images).Select(x =>x.ImagePath).FirstOrDefault()" class="product-image" alt="@products.Name">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="product-name">@products.Name</div>
+                                        <div class="product-sku">@products.SKU</div>
+                                    </td>
+                                    <td>@products.Category.Name</td>
+                                    <td class="product-price">₹@products.Price</td>
+                                    <td>@products.SKU</td>
+                                    @* <td>
+                            <div class="product-stock">
+                            <div class="stock-indicator ${stockClass}"></div>
+                            <span>${stockText}</span>
+                            </div>
+                            </td> *@
+                                    <td><span class="product-status status-@products.IsActive}">@(products.IsActive ? "Active" : "Inactive")</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a class="btn-icon btn-view" asp-controller="Product" asp-action="Detail" asp-route-id="@products.Id" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a class="btn-icon btn-edit" asp-controller="Product" asp-action="Edit" asp-route-id="@products.Id" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn-icon isActive @(products.IsActive ? "btn-active" : "btn-inactive")"
+                                                    data-id="@products.Id"
+                                                    data-active="@products.IsActive"
+                                                    title="@(products.IsActive ? "Deactivate" : "Activate")">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+
+                                            <button class="btn-icon btn-delete" onclick="deleteProduct(@products.Id)" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state" id="productsEmptyState">
+                    <i class="fas fa-box-open"></i>
+                    <h3>No products found</h3>
+                    <p>Add your first product using the "Add Product" button.</p>
+                </div>
+            }
+
+
+
+            <div class="pagination" id="productsPagination" style="display: none;">
+                <button onclick="changeProductsPage(-1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button onclick="changeProductsPage(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+
+            $(".isActive").on("click", function () {
+
+                let btn = $(this);
+                let productId = btn.data("id");
+
+                $.ajax({
+                    url: "/Product/CheckActive",
+                    type: "POST",
+                    data: { productId: productId },
+
+                    success: function (response) {
+
+                        if (response.success) {
+
+                            if (response.isActive) {
+                                showNotification("Product activated successfully", "success");
+                            } else {
+                                showNotification("Product deactivated successfully", "warning");
+                            }
+
+                            btn.data("active", response.isActive);
+                            btn.attr("title", response.isActive ? "Deactivate" : "Activate");
+                            btn.toggleClass("active", response.isActive);
+
+                            if (response.isActive) {
+                                btn.addClass("btn-active").removeClass("btn-inactive");
+                            } else {
+                                btn.addClass("btn-inactive").removeClass("btn-active");
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert("Something went wrong");
+                    }
+                });
+            });
+        });
+
+
+    </script>
+
+
+    <script src="~/admin/product.js"></script>

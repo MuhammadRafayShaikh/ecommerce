@@ -1,0 +1,29 @@
+﻿<style>
+    a{
+        text-decoration: none;
+    }
+</style>
+<div class="header">
+    <div class="header-title">
+        <div class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <h1><i class="fas fa-tshirt"></i> <span id="pageTitle">Add New Product</span></h1>
+    </div>
+
+    <div class="header-controls">
+        <a class="btn btn-secondary" asp-controller="Product" asp-action="Add">
+            <i class="fas fa-plus"></i> Add Product
+        </a>
+        <a class="btn btn-primary" asp-controller="Product" asp-action="Index">
+            <i class="fas fa-list"></i> View All
+        </a>
+        <div class="admin-profile">
+            <div class="admin-avatar">AS</div>
+            <div class="admin-info">
+                <h3>Admin Sharma</h3>
+                <p>Store Manager</p>
+            </div>
+        </div>
+    </div>
+</div>

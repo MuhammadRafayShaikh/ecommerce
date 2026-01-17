@@ -1,0 +1,108 @@
+﻿@model E_Commerce.Models.Collections
+@{
+    List<int> productIds = TempData["cartProducts"] as List<int>;
+}
+@if (Model.Products.Any())
+{
+    @foreach (var products in Model.Products)
+    {
+        <div class="collection-item"
+             data-product-id="@products.Id"
+             data-product-name="@products.Name"
+             data-original-price="@products.Price"
+             data-discount-type="@(products.Discount != null ? (int)products.Discount.DiscountType : 0)"
+             data-discount-value="@(products.Discount?.DiscountValue ?? 0)">
+
+            <div class="collection-img" style="background-image: url('/ProductImages/@products.ProductColors.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()');">
+                <div class="collection-badge">Sale</div>
+            </div>
+            <div class="collection-content">
+                <div class="collection-meta">
+                    <h3>@products.Name</h3>
+                    <div class="collection-rating">
+                        <i class="fas fa-star"></i> 4.8
+                    </div>
+                </div>
+                <p>@products.ShortDescription</p>
+                <div class="collection-meta">
+                    @if (products.Discount != null)
+                    {
+                        decimal discountedPrice = products.Price;
+                        if (products.Discount.DiscountType == Discount._Type.Percentage)
+                        {
+                            discountedPrice = products.Price - (products.Price * products.Discount.DiscountValue / 100);
+                        }
+                        else if (products.Discount.DiscountType == Discount._Type.Fixed)
+                        {
+                            discountedPrice = products.Price - products.Discount.DiscountValue;
+                        }
+
+                        <div class="collection-price">
+                            <span class="original-price" style="text-decoration: line-through; color: #999; margin-right: 8px;">
+                                ₹@products.Price
+                            </span>
+                            <span class="discounted-price" style="color: #e53935; font-weight: bold;">
+                                ₹@discountedPrice
+                            </span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="collection-price">₹@products.Price</div>
+                    }
+
+                    <div class="collection-colors">
+                        @foreach (var color in products.ProductColors)
+                        {
+                            <span class="color-dot"
+                                  style="background-color:@color.ColorCode"
+                                  title="@color.ColorName"
+                                  data-color-sizes="@color.Sizes"
+                                  data-color-price="@color.ExtraPrice"
+                                  data-color-id="@color.Id"
+                                  data-stock="@color.Stock">
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                <div class="collection-actions">
+                    <a style="text-decoration:none;" asp-controller="Detail" asp-action="Index" asp-route-id="@products.Id">
+                        <div class="view-btn">View Details</div>
+                    </a>
+
+                    @if (User.Identity.IsAuthenticated && productIds.Contains(products.Id))
+                    {
+                        <a href="/Cart/Index"
+                           class="view-cart"
+                           data-product-id="@products.Id"
+                           style="text-decoration:none;">
+                            <div>View Cart</div>
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="cart-btn"
+                             data-product-id="@products.Id">
+                            Add to Cart
+                        </div>
+
+                        <a href="/Cart/Index"
+                           class="view-cart"
+                           data-product-id="@products.Id"
+                           style="display:none; text-decoration:none;">
+                            <div>View Cart</div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    @await Html.PartialAsync("_CartModal")
+}
+else
+{
+    <h2 style="text-align:center;">OOPS! No Product Found</h2>
+}
+
+<script src="~/user/modal.js"></script>

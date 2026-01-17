@@ -1,0 +1,129 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+@model List<E_Commerce.Models.Category>
+<style>
+    .btn-success {
+        background: #28a745;
+        color: #fff;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: #fff;
+    }
+    
+
+</style>
+<div class="main-content" id="mainContent">
+    @await Html.PartialAsync("_AdminCategoryHeader")
+
+
+    <div class="page-container" id="viewCategoriesPage">
+        <div class="categories-table-container">
+            <div class="table-header">
+                <h2><i class="fas fa-list"></i> All Categories</h2>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="categorySearch" placeholder="Search categories..." onkeyup="searchCategories()">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="categories-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Slug</th>
+                            <th>Description</th>
+                            <th>Products</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var categories in Model)
+                        {
+                            var description = categories.Description;
+                            if (categories.Description.Length > 30)
+                            {
+                                description = categories.Description.Substring(0, 30);
+                                description += "...";
+                            }
+                            <tr>
+                                <td>@categories.Id</td>
+                                <td><img src="~/CategoryImages/@categories.Image" height="100" /></td>
+                                <td>@categories.Name</td>
+                                <td>@categories.Slug</td>
+                                <td>@description</td>
+                                <td></td>
+                                <td>
+                                    <a asp-controller="Category" asp-action="Edit" asp-route-id="@categories.Id" class="btn btn-warning btn-sm">Edit</a>
+                                    <button class="isActive btn" data-id="@categories.Id">
+                                        @(categories.IsActive ? "Active" : "Inactive")
+                                    </button>
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="empty-state" id="allEmptyState">
+                <i class="fas fa-folder-open"></i>
+                <h3>No categories found</h3>
+                <p>Add your first category using the "Add Category" button.</p>
+            </div>
+
+            <div class="pagination" id="pagination" style="display: none;">
+                <button onclick="changePage(-1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button onclick="changePage(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+
+            $(".isActive").on("click", function () {
+
+                let btn = $(this);
+                let categoryId = btn.data("id");
+
+                $.ajax({
+                    url: "/Category/CheckActive",
+                    type: "POST",
+                    data: { categoryId: categoryId },
+
+                    success: function (response) {
+
+                        if (response.success) {
+
+                            showNotification(response.message, "success");
+
+                            if (response.isActive) {
+                                btn.text("Active");
+                                btn.removeClass("btn-danger")
+                                    .addClass("btn-success");
+                            } else {
+                                btn.text("Inactive");
+                                btn.removeClass("btn-success")
+                                    .addClass("btn-danger");
+                            }
+
+                        } else {
+                            showNotification(response.message, "warning");
+                        }
+                    }
+                });
+            });
+        });
+
+    </script>
+
+    <script src="~/admin/category.js"></script>

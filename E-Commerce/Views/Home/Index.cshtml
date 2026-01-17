@@ -1,0 +1,152 @@
+﻿@{
+    ViewData["Title"] = "Premium gents Suits";
+    Layout = "_Layout";
+}
+@model E_Commerce.Models.HomeViewModel
+@section Styles {
+    <link rel="stylesheet" href="~/user/index.css" asp-append-version="true">
+}
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1>Elegance Stitched in Every <span>Suit</span></h1>
+            <p>Discover our exclusive collection of handcrafted gents suits, blending traditional craftsmanship with contemporary designs for the modern woman.</p>
+            <a href="#categories" class="cta-button">Shop Now</a>
+        </div>
+        <div class="hero-image">
+            <div class="floating-suit"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories" id="categories">
+    <div class="section-title">
+        <h2>Our Collections</h2>
+        <p>Explore our handpicked categories, each crafted to perfection for different occasions and styles.</p>
+    </div>
+
+    <div class="categories-grid">
+        @foreach(var category in Model.Categories)
+        {
+            <a asp-controller="Home" asp-action="Collections" asp-route-id="@category.Id" class="category-link">
+                <div class="category-card">
+                    <div class="category-img" style="background-image: url('/CategoryImages/@category.Image');"></div>
+                    <div class="category-content">
+                        <h3>@category.Name</h3>
+                        <p>@category.Description</p>
+                    </div>
+                </div>
+            </a>
+        }
+        
+
+        
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="featured-products" id="featured">
+    <div class="products-container">
+        <div class="section-title">
+            <h2>Featured Suits</h2>
+            <p>Our best-selling designs loved by thousands of women across the country.</p>
+        </div>
+
+        <div class="products-grid">
+            <a style="text-decoration: none;" asp-controller="Home" asp-action="Featured" asp-route-highlightedProduct="bestseller">
+                <div class="product-card">
+                    <div class="product-img" style="background-image: url('');">
+                        <div class="product-badge">Bestseller</div>
+                    </div>
+                    <div class="product-content">
+                        <h3>Royal Blue Anarkali</h3>
+                        <div class="product-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <div class="product-price">₹3,499 <del>₹4,999</del></div>
+                    </div>
+                </div>
+            </a>
+
+            <a style="text-decoration: none;" asp-controller="Home" asp-action="Featured" asp-route-highlightedProduct="new">
+                <div class="product-card">
+                    <div class="product-img" style="background-image: url('/ProductImages/@Model.NewProduct.ProductColors.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()');">
+                        <div class="product-badge">New</div>
+                    </div>
+                    <div class="product-content">
+                        <h3>@Model.NewProduct.Name</h3>
+                        <div class="product-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <div class="product-price">₹@Model.NewProduct.Price </div>
+                    </div>
+                </div>
+            </a>
+
+            <a style="text-decoration: none;" asp-controller="Home" asp-action="Featured" asp-route-highlightedProduct="discount">
+                <div class="product-card">
+                    <div class="product-img" style="background-image: url('/ProductImages/@Model.AttractiveDiscount.ProductImage');">
+                        <div class="product-badge">Sale @Model.AttractiveDiscount.DiscountText</div>
+                    </div>
+                    <div class="product-content">
+                        <h3>@Model.AttractiveDiscount.Product.Name</h3>
+                        <div class="product-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="product-price">₹@Model.AttractiveDiscount.DiscountedPrice <del>₹@Model.AttractiveDiscount.OriginalPrice</del></div>
+                    </div>
+                </div>
+            </a>
+
+            <a style="text-decoration: none;" asp-controller="Home" asp-action="Featured" asp-route-highlightedProduct="limited">
+                <div class="product-card">
+                    <div class="product-img" style="background-image: url('');">
+                        <div class="product-badge">Limited</div>
+                    </div>
+                    <div class="product-content">
+                        <h3>Maroon Embroidered Suit</h3>
+                        <div class="product-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <div class="product-price">₹5,999 <del>₹8,999</del></div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter -->
+<section class="newsletter">
+    <div class="newsletter-container">
+        <h2>Stay Updated</h2>
+        <p>Subscribe to our newsletter and be the first to know about new collections, exclusive offers, and style tips.</p>
+        <form class="newsletter-form">
+            <input type="email" placeholder="Enter your email address" required>
+            <button type="submit">Subscribe</button>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/user/index.js" asp-append-version="true"></script>
+}

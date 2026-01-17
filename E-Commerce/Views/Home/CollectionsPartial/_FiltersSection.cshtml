@@ -1,0 +1,60 @@
+﻿@model E_Commerce.Models.Collections
+
+<!-- Filter Section -->
+<div class="filter-section">
+    <div class="filter-header">
+        <h2>Filter Collections</h2>
+        <div class="filter-count">@Model.Products.Count() Products</div>
+    </div>
+
+    <div class="filter-options">
+        <div class="filter-group">
+            <h3>Price Range</h3>
+            <div class="price-range">
+                <input type="hidden" value="@ViewData["categoryId"]" id="categoryId" />
+                <input type="number" placeholder="Min" id="minPrice" value="999">
+                <span>to</span>
+                <input type="number" placeholder="Max" id="maxPrice" value="9999">
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <h3>Fabric</h3>
+            <div class="filter-choices">
+                @foreach (var fabric in Model.Fabrics)
+                {
+                    <button class="filter-btn" data-filter="fabric" data-value="@fabric">
+                        @fabric
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <h3>Occasion</h3>
+            <div class="filter-choices">
+                @foreach (var occasion in Model.Occasions)
+                {
+                    <button class="filter-btn" data-filter="occasion" data-value="@occasion">
+                        @occasion
+                    </button>
+                }
+
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <h3>Color</h3>
+            <div class="filter-choices">
+                @foreach (var color in Model.Colors)
+                {
+                    <button class="filter-btn" data-filter="color" data-value="@color">
+                        @color
+                    </button>
+                }
+            </div>
+        </div>
+
+    </div>
+
+</div>

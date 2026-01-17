@@ -1,0 +1,305 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+@model E_Commerce.Models.Product
+<div class="main-content" id="mainContent">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <h1><i class="fas fa-edit"></i> Edit Product</h1>
+        </div>
+
+        <div class="header-controls">
+            <button class="btn btn-outline" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <div class="admin-profile">
+                <div class="admin-avatar">AS</div>
+                <div class="admin-info">
+                    <h3>Admin Sharma</h3>
+                    <p>Store Manager</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading" id="loadingState">
+        <i class="fas fa-spinner"></i>
+        <p>Loading product data...</p>
+    </div>
+
+    <!-- Edit Product Container -->
+    <div class="edit-product-container" id="editProductContainer" style="display: none;">
+        <div class="form-header">
+            <h2>
+                <i class="fas fa-edit"></i> Edit Product: <span id="productNameTitle">
+                    Royal Blue Anarkali
+                    Suit
+                </span>
+            </h2>
+            <div class="product-meta">
+                <span class="badge">SKU: <strong id="productSkuTitle">LS-AN-001</strong></span>
+                <span class="badge">ID: <strong id="productIdTitle">#1</strong></span>
+            </div>
+        </div>
+
+        <form id="editProductForm" asp-controller="Product" asp-action="Edit" enctype="multipart/form-data">
+            <input type="hidden" id="productId" value="1">
+            <input type="hidden" name="ColorVariantsJson" id="ColorVariantsJson">
+            <input type="hidden" id="dbColors"
+                   value='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+           Model.ProductColors.Select(c => c.ColorName)
+       ))'>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Name">Product Name <span class="required">*</span></label>
+                    <input asp-for="Name" id="productName" class="form-control"
+                           placeholder="e.g., Royal Blue Anarkali Suit" required>
+                    <span asp-validation-for="Name"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CategoryId">Category <span class="required">*</span></label>
+                    <select id="productCategory" asp-for="CategoryId" class="form-control" required>
+
+                        @foreach (var categories in ViewData["categories"] as List<Category>)
+                        {
+
+                            <option selected="@(categories.Id == Model.CategoryId ? false : true)" value="@categories.Id">@categories.Name</option>
+                        }
+
+                    </select>
+                    <span asp-validation-for="CategoryId"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Price">Base Price (₹) <span class="required">*</span></label>
+                    <input asp-for="Price" id="productPrice" class="form-control" placeholder="e.g., 3999" min="0"
+                           step="0.01" required>
+                    <span asp-validation-for="Price"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SKU">Product Code / SKU <span class="required">*</span></label>
+                    <input asp-for="SKU" id="productSKU" class="form-control" placeholder="e.g., LS-AN-001"
+                           required>
+                    <span asp-validation-for="SKU"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Brand">Brand</label>
+                    <input asp-for="Brand" id="productBrand" class="form-control" placeholder="e.g., Luxe Suits">
+                    <span asp-validation-for="Brand"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Availability">Availability</label>
+                    <select asp-for="Availability" id="productAvailability" class="form-control">
+                        <option value="in-stock">In Stock</option>
+                        <option value="out-of-stock">Out of Stock</option>
+                        <option value="pre-order">Pre-Order</option>
+                    </select>
+                    <span asp-validation-for="Availability"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ShortDescription">Short Description</label>
+                <textarea asp-for="ShortDescription" id="shortDescription" class="form-control"
+                          placeholder="Brief description of the product (max 200 characters)"
+                          maxlength="200"></textarea>
+                <span asp-validation-for="ShortDescription"></span>
+            </div>
+
+            <div class="form-group full-width">
+                <label asp-for="FullDescription">Product Complete Details</label>
+                <textarea asp-for="FullDescription" id="fullDescription" class="form-control"
+                          placeholder="Complete description including fabric, work, design, occasion, etc."
+                          rows="4"></textarea>
+                <span asp-validation-for="FullDescription"></span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Weight">Weight (grams)</label>
+                    <input asp-for="Weight" id="productWeight" class="form-control" placeholder="e.g., 850"
+                           min="0">
+                    <span asp-validation-for="Weight"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Fabric">Fabric</label>
+                    <input asp-for="Fabric" id="productFabric" class="form-control"
+                           placeholder="e.g., Silk, Georgette, Chiffon">
+                    <span asp-validation-for="Fabric"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="IsActive">Status</label>
+                    <select asp-for="IsActive" id="productStatus" class="form-control">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <span asp-validation-for="IsActive"></span>
+                </div>
+            </div>
+
+            <!-- Color Selection Section -->
+            <div class="form-group full-width">
+                <label>Select Colors (Click to add/remove color variant)</label>
+                <div class="selection-container" id="colorSelection">
+                    <div class="selection-item" data-value="Red" data-color="#f44336">
+                        <div class="color-box" style="background-color: #f44336;"></div>
+                        Red
+                    </div>
+                    <div class="selection-item" data-value="Blue" data-color="#2196f3">
+                        <div class="color-box" style="background-color: #2196f3;"></div>
+                        Blue
+                    </div>
+                    <div class="selection-item" data-value="Green" data-color="#4caf50">
+                        <div class="color-box" style="background-color: #4caf50;"></div>
+                        Green
+                    </div>
+                    <div class="selection-item" data-value="Black" data-color="#333">
+                        <div class="color-box" style="background-color: #333;"></div>
+                        Black
+                    </div>
+                    <div class="selection-item" data-value="Pink" data-color="#e91e63">
+                        <div class="color-box" style="background-color: #e91e63;"></div>
+                        Pink
+                    </div>
+                    <div class="selection-item" data-value="Purple" data-color="#9c27b0">
+                        <div class="color-box" style="background-color: #9c27b0;"></div>
+                        Purple
+                    </div>
+                    <div class="selection-item" data-value="Yellow" data-color="#ffeb3b">
+                        <div class="color-box" style="background-color: #ffeb3b;"></div>
+                        Yellow
+                    </div>
+                    <div class="selection-item" data-value="White" data-color="#ffffff">
+                        <div class="color-box" style="background-color: #ffffff; border: 1px solid #ccc;"></div>
+                        White
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Color Sections Container -->
+            <div id="colorSectionsContainer">
+                @foreach(var colors in Model.ProductColors)
+                {
+                    <div class="color-section-header">
+                        <div class="color-section-title">
+                            <div class="color-box" style="background-color: @colors.ColorCode;"></div>
+                            <span>@colors.ColorName Variant <span style="font-size:12px; color:#666;">(From Database)</span></span>
+                        </div>
+                        <button type="button" class="remove-color-section" onclick="removeColorSection('${color}', ${isFromDb})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stock_@colors.ColorName">Stock for @colors.ColorName <span class="required">*</span></label>
+                            <input type="number" id="stock_@colors.ColorName" class="form-control color-stock" data-color="@colors.ColorName"
+                                   value="@colors.Stock" placeholder="e.g., 50" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="extraPrice_@colors.ColorName">Extra Price for @colors.ColorName (₹)</label>
+                            <input type="number" id="extraPrice_@colors.ColorName" class="form-control color-extra-price" data-color="@colors.ColorName"
+                                   value="@colors.Stock" placeholder="e.g., 500" min="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Available Sizes for @colors.ColorName</label>
+                        @{
+                            var selectedSizes = colors.Sizes; // List<string> of selected sizes
+                        }
+                        <div class="selection-container color-sizes" data-color="@colors.ColorName" id="sizes_@colors.ColorName.Replace(" ", "-")">
+                            @foreach (var size in new[] { "S", "M", "L", "XL", "XXL" })
+                            {
+                                var activeClass = selectedSizes.Contains(size) ? "active" : "";
+                                <div class="selection-item @activeClass" data-value="@size">@size</div>
+                            }
+                        </div>
+
+                        <input type="hidden"
+                               id="selectedSizes_@colors.ColorName.Replace(" ", "-")"
+                               class="selected-sizes"
+                               data-color="@colors.ColorName"
+                               value="@string.Join(",", selectedSizes)">
+
+    
+                    </div>
+
+                    <div class="form-group">
+                        <label>Images for @colors.ColorName (4-6 images recommended)</label>
+                        <div class="image-upload-section">
+                            <div class="image-preview-container color-image-preview-container" id="colorImagePreview_${color}" data-color="${color}">
+                                @foreach(var images in colors.Images)
+                                {
+                                    <div class="image-preview-item color-image-preview-item">
+                                        <img src="~/ProductImages/@images.ImagePath" alt="@colors.ColorName Image">
+                                        <div class="remove-image" onclick="removeColorImage(@colors.ColorName, @images.Id)">
+                                            <i class="fas fa-times"></i>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <input type="file" class="color-image-upload" data-color="${color}" accept="image/*" multiple
+                                   style="display: none;" onchange="handleColorImageUpload(event, '${color}')">
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+            <div class="form-actions">
+                <div>
+                    <button type="button" class="btn btn-outline" onclick="showPreview()">
+                        <i class="fas fa-eye"></i> Preview Changes
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="resetFormToOriginal()">
+                        <i class="fas fa-redo"></i> Reset to Original
+                    </button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-secondary" onclick="cancelEdit()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Update Product
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Preview Section -->
+    <div class="preview-section" id="previewSection">
+        <div class="preview-header">
+            <h2><i class="fas fa-eye"></i> Preview Changes</h2>
+            <button class="btn btn-outline" onclick="hidePreview()">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+        <div class="preview-content" id="previewContent">
+            <!-- Preview content will be populated here -->
+        </div>
+    </div>
+    <script>
+        const productColorsFromDb = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(ViewBag.ProductColors)
+            );
+        
+    </script>
+
+    <script src="~/admin/editproduct.js"></script>

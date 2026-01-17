@@ -1,0 +1,112 @@
+﻿@{
+    Layout = null;
+}
+@model E_Commerce.Models.LoginViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Elegant Suits Boutique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="~/auth/login.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel with Branding -->
+        <div class="left-panel">
+            <div class="logo">Elegant<span>Suits</span></div>
+            <p class="tagline">Welcome back to our exclusive collection of gents suits. Continue your fashion journey with us.</p>
+            <ul class="features">
+                <li><i class="fas fa-star"></i> Exclusive member discounts</li>
+                <li><i class="fas fa-shipping-fast"></i> Fast & free delivery</li>
+                <li><i class="fas fa-heart"></i> Save your favorite items</li>
+                <li><i class="fas fa-history"></i> Track your order history</li>
+                <li><i class="fas fa-gift"></i> Special birthday offers</li>
+            </ul>
+        </div>
+
+        <!-- Right Panel with Login Form -->
+        <div class="right-panel">
+            <div class="form-header">
+                <h1>Welcome Back</h1>
+                <p>Login to your account to continue shopping</p>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div class="message success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i> Login successful! Redirecting...
+            </div>
+
+            <div class="message error-message" id="errorMessage">
+                <i class="fas fa-exclamation-circle"></i> Invalid email or password. Please try again.
+            </div>
+
+            <form id="loginForm" asp-controller="Account" asp-action="Login">
+                <div class="form-group">
+                    <label asp-for="Email">Email Address</label>
+                    <input type="email" asp-for="Email" id="email" placeholder="Enter your email address" required>
+                    <div class="error" id="emailError">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password">Password</label>
+                    <div class="password-container">
+                        <input type="password" asp-for="Password" id="password" placeholder="Enter your password" required>
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error" id="passwordError">Please enter your password</div>
+                </div>
+
+                <div class="forgot-password">
+                    <a href="#" id="forgotPasswordLink">Forgot your password?</a>
+                </div>
+
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember me on this device</label>
+                </div>
+
+                <button type="submit" class="login-btn">Login to Account</button>
+
+                <div class="divider">Or login with</div>
+                <div class="signup-link">
+                    Don't have an account? <a asp-controller="Account" asp-action="Register" id="signupLink">Create one now</a>
+                </div>
+
+                <div class="admin-login">
+                    <a href="#" id="adminLoginLink">Are you an admin? Login here</a>
+                </div>
+            </form>
+            <!-- Google Login Button with Individual Letter Icons -->
+            <form asp-action="GoogleLogin" asp-controller="Account" method="post">
+                <button type="submit" class="google-login">
+                    <div class="google-icon">
+                        <span class="letter-g">G</span>
+                        <span class="letter-o1">o</span>
+                        <span class="letter-o2">o</span>
+                        <span class="letter-g2">g</span>
+                        <span class="letter-l">l</span>
+                        <span class="letter-e">e</span>
+                    </div>
+                </button>
+            </form>
+
+
+
+        </div>
+    </div>
+
+    <script src="~/auth/login.js"></script>
+    <script src="~/notification.js"></script>
+    @if (TempData["error"] != null)
+    {
+        <script>
+            showNotification("@TempData["error"]", "warning");
+        </script>
+    }
+</body>
+</html>

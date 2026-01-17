@@ -1,0 +1,101 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+@model E_Commerce.Models.Category
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    @await Html.PartialAsync("_AdminCategoryHeader")
+
+
+    <!-- Add Category Page -->
+    <div class="page-container active" id="addCategoryPage">
+        <div class="add-category-container">
+            <div class="form-header">
+                <h2><i class="fas fa-plus-circle"></i> Edit Category</h2>
+                <div class="category-count">
+                    <span class="badge">Total Categories: <strong id="totalCategories">12</strong></span>
+                </div>
+            </div>
+
+            <form asp-controller="Category" asp-action="Edit" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id"/>
+                <input type="hidden" asp-for="Image" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Name">Category Name *</label>
+                        <input asp-for="Name" id="categoryName" class="form-control" placeholder="e.g., Anarkali Suits" required>
+                        <span asp-validation-for="Name"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Slug">Slug *</label>
+                        <input id="categorySlug" asp-for="Slug" class="form-control" placeholder="e.g., anarkali-suits" required>
+                        <span asp-validation-for="Slug"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description">Description</label>
+                    <textarea asp-for="Description" class="form-control" placeholder="Describe this category..."></textarea>
+                    <span asp-validation-for="Description"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Category Image</label>
+                    <div class="image-upload-container" onclick="document.getElementById('categoryImage').click()">
+                        <div class="image-upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="image-upload-text">Click to upload category image</div>
+                        <div class="image-upload-hint">PNG, JPG or JPEG (Max 2MB)</div>
+                        <input type="file" asp-for="Image" id="categoryImage" accept="image/*" style="display: none;">
+                    </div>
+                    <div id="imagePreview" style=" margin-top: 15px;">
+                        <img id="previewImage" src="~/CategoryImages/@Model.Image" alt="Preview" style="max-width: 200px; border-radius: 10px;">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Edit Category
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="recent-categories">
+            <div class="categories-table-container">
+                <div class="table-header">
+                    <h2><i class="fas fa-history"></i> Recently Added Categories</h2>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="categories-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Category Name</th>
+                                <th>Products</th>
+                                <th>Status</th>
+                                <th>Added On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentCategoriesTable">
+                            <!-- Recent categories will be populated here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="empty-state" id="recentEmptyState" style="display: none;">
+                    <i class="fas fa-folder-open"></i>
+                    <h3>No categories added yet</h3>
+                    <p>Start by adding your first category using the form above.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+

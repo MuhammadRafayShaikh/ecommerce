@@ -1,0 +1,161 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+@model List<E_Commerce.Models.Product>
+<style>
+    a{
+        text-decoration: none;
+    }
+</style>
+<div class="main-content" id="mainContent">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <h1><i class="fas fa-tshirt"></i> <span id="pageTitle">Add New Product</span></h1>
+        </div>
+
+        <div class="header-controls">
+            <a class="btn btn-secondary" asp-controller="Product" asp-action="Add">
+                <i class="fas fa-plus"></i> Add Product
+            </a>
+            <a class="btn btn-primary" asp-controller="Product" asp-action="Index">
+                <i class="fas fa-list"></i> View All
+            </a>
+            <div class="admin-profile">
+                <div class="admin-avatar">AS</div>
+                <div class="admin-info">
+                    <h3>Admin Sharma</h3>
+                    <p>Store Manager</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-container" id="discountManagementPage">
+        <div class="discount-stats">
+            <div class="discount-stat-card">
+                <div class="discount-stat-icon">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="discount-stat-info">
+                    <h3 id="discountedProductsCount">@Model.Where(x => x.Discount != null).Count()</h3>
+                    <p>Discounted Products</p>
+                </div>
+            </div>
+
+            <div class="discount-stat-card">
+                <div class="discount-stat-icon">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="discount-stat-info">
+                    <h3 id="totalDiscountValue">₹8,450</h3>
+                    <p>Total Discount Value</p>
+                </div>
+            </div>
+
+            <div class="discount-stat-card">
+                <div class="discount-stat-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <div class="discount-stat-info">
+                    <h3 id="avgDiscountPercentage">15%</h3>
+                    <p>Average Discount</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="discount-management-container">
+
+            <div class="table-header">
+                <h2><i class="fas fa-percentage"></i> Discount Management</h2>
+                <div class="table-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="discountSearch" placeholder="Search products..." onkeyup="searchDiscountProducts()">
+                    </div>
+                    <select class="filter-select" id="discountCategoryFilter" onchange="filterDiscountProducts()">
+                        <option value="">All Categories</option>
+                        <option value="Anarkali Suits">Anarkali Suits</option>
+                        <option value="Lehenga Choli">Lehenga Choli</option>
+                        <option value="Sharara Suits">Sharara Suits</option>
+                        <option value="Palazzo Suits">Palazzo Suits</option>
+                    </select>
+                    <select class="filter-select" id="discountStatusFilter" onchange="filterDiscountProducts()">
+                        <option value="">All Discounts</option>
+                        <option value="with-discount">With Discount</option>
+                        <option value="without-discount">Without Discount</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="discount-form">
+                <h3 style="margin-bottom: 15px; color: var(--dark);">Bulk Discount Apply</h3>
+                <div class="discount-input-group">
+                    <div class="form-group discount-type-select">
+                        <label>Discount Type</label>
+                        <select class="form-control" id="bulkDiscountType">
+                            <option value="percentage">Percentage (%)</option>
+                            <option value="fixed">Fixed Amount (₹)</option>
+                        </select>
+                    </div>
+                    <div class="form-group discount-value-input">
+                        <label>Discount Value</label>
+                        <input type="number" class="form-control" id="bulkDiscountValue" placeholder="Enter value" min="0">
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-warning" onclick="applyBulkDiscount()" style="background-color: var(--warning);">
+                            <i class="fas fa-tags"></i> Apply to Selected
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="discount-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">
+                                <input type="checkbox" id="selectAllDiscounts" onchange="toggleSelectAllDiscounts(this)">
+                            </th>
+                            <th>Product</th>
+                            <th>Original Price</th>
+                            <th>Current Discount</th>
+                            <th>Discounted Price</th>
+                            <th>New Discount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="discountProductsTable">
+                        @await Html.PartialAsync("_DiscountProductsTable")
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="empty-state" id="discountEmptyState">
+                <i class="fas fa-percentage"></i>
+                <h3>No products found</h3>
+                <p>Add products first to manage discounts.</p>
+            </div>
+
+
+
+
+
+            <div class="pagination" id="discountPagination" style="display: none;">
+                <button onclick="changeDiscountPage(-1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button onclick="changeDiscountPage(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/admin/discount.js"></script>
+
+    

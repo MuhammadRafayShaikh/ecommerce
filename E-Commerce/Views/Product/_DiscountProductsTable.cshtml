@@ -1,0 +1,117 @@
+﻿@model List<E_Commerce.Models.Product>
+
+@foreach (var product in Model)
+{
+    var discount = product.Discount;
+    bool hasDiscount = discount != null && discount.DiscountValue > 0;
+
+
+    <tr>
+        <td>
+            <input type="checkbox"
+                   class="product-discount-checkbox"
+                   data-id="@product.Id" />
+        </td>
+
+        <td>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <img src="~/ProductImages/@product.ProductColors.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()"
+                     style="width:50px; height:50px; border-radius:8px; object-fit:cover;" />
+
+                <div>
+                    <div style="font-weight:600;">@product.Name</div>
+                    <div style="font-size:13px; color:#777;">@product.SKU</div>
+                </div>
+            </div>
+        </td>
+
+        <td class="product-price">
+            ₹@product.Price.ToString("N0")
+        </td>
+
+        <td>
+            @if (discount != null && hasDiscount)
+            {
+                <span class="discount-badge">
+                    @if (discount.DiscountType == Discount._Type.Percentage)
+                    {
+                        @($"{discount.DiscountValue}%")
+                    }
+                    else
+                    {
+                        @($"₹{discount.DiscountValue}")
+                    }
+                </span>
+            }
+            else
+            {
+                <span class="no-discount-badge">No Discount</span>
+            }
+        </td>
+
+
+        <td class="discounted-price">
+            ₹@(discount?.DiscountedPrice.ToString("N0") ?? product.Price.ToString("N0"))
+        </td>
+
+
+        <td>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <select class="discount-input-small discount-type-select"
+                        data-id="@product.Id"
+                        style="flex:1;">
+                    <option value="">Select Type</option>
+                    <option value="percentage"
+                            selected="@(discount?.DiscountType == Discount._Type.Percentage)">
+                        Percentage
+                    </option>
+
+                    <option value="fixed"
+                            selected="@(discount?.DiscountType == Discount._Type.Fixed)">
+                        Fixed Amount
+                    </option>
+
+                </select>
+
+                <input type="number"
+                       class="discount-input-small discount-value-input"
+                       data-id="@product.Id"
+                       value="@(discount != null && discount.DiscountValue > 0 ? discount.DiscountValue : (decimal?)null)"
+                       placeholder="Value"
+                       min="0"
+                       max="@(discount?.DiscountType == Discount._Type.Percentage ? 100 : (int?)null)"
+                       style="flex:1;" />
+
+            </div>
+        </td>
+
+        <td>
+            <div class="action-buttons">
+                <button class="btn-icon btn-success"
+                        onclick="applyDiscountToProduct(@product.Id)"
+                        title="Apply Discount">
+                    <i class="fas fa-check"></i>
+                </button>
+
+                <button class="btn-icon btn-danger"
+                        onclick="removeDiscountFromProduct(@product.Id)"
+                        title="Remove Discount">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </td>
+    </tr>
+}
+
+@if (TempData["success"] != null)
+{
+    <script>
+        showNotification("@TempData["success"]", "success");
+    </script>
+}
+@if (TempData["error"] != null)
+{
+    <script>
+        showNotification("@TempData["error"]", "warning");
+    </script>
+}

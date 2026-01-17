@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxe Suits - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="~/admin/style.css"/>
+    <link rel="stylesheet" href="~/admin/category.css"/>
+    <link rel="stylesheet" href="~/admin/product.css"/>
+    <link rel="stylesheet" href="~/admin/productdetail.css"/>
+    <link rel="stylesheet" href="~/admin/editproduct.css"/>
+    <link rel="stylesheet" href="~/admin/discount.css"/>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar" id="sidebar">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-vest-patches"></i>
+                </div>
+                <div class="logo-text">Luxe<span>Suits</span></div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a asp-controller="Admin" asp-action="Index" class="nav-link">
+                        <i class="fas fa-home nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Category" asp-action="Index" class="nav-link">
+                        <i class="fas fa-list nav-icon"></i>
+                        <span class="nav-text">Categories</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Product" asp-action="Index" class="nav-link">
+                        <i class="fas fa-eye nav-icon"></i>
+                        <span class="nav-text">Products</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Product" asp-action="Discounts" class="nav-link">
+                        <i class="fas fa-tags nav-icon"></i>
+                        <span class="nav-text">Discounts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Order" asp-action="Index" class="nav-link">
+                        <i class="fas fa-shopping-bag nav-icon"></i>
+                        <span class="nav-text">Orders</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-users nav-icon"></i>
+                        <span class="nav-text">Customers</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog nav-icon"></i>
+                        <span class="nav-text">Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Floating Elements -->
+            <div class="floating-element floating-1"></div>
+            <div class="floating-element floating-2"></div>
+        </div>
+
+        @RenderBody()
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2023 Luxe Suits Admin Dashboard. All rights reserved. | Designed with <i class="fas fa-heart" style="color: var(--secondary);"></i> for gents fashion e-commerce</p>
+        </div>
+    </div>
+    </div>
+    
+    <script src="~/admin/script.js"></script>
+    
+    
+</body>
+</html>

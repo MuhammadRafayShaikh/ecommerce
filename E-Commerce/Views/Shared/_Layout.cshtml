@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Elegant Stitch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="~/user/style.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/user/cart.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/user/modal.css" asp-append-version="true">
+    <script src="~/user/notification/notification.js"></script>
+
+    <script src="~/notification.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="header-container">
+            <a href="/" class="logo">
+                <i class="fas fa-vest"></i>Elegant<span>Stitch</span>
+            </a>
+
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <nav id="navMenu">
+                <ul>
+                    <li><a href="/" class="@(ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">Home</a></li>
+                    <li><a asp-controller="Home" asp-action="Collections" class="@(ViewContext.RouteData.Values["Action"].ToString() == "Collections" ? "active" : "")">Collections</a></li>
+                    <li><a asp-controller="Home" asp-action="Featured" class="@(ViewContext.RouteData.Values["Action"].ToString() == "Featured" ? "active" : "")">Featured</a></li>
+                    <li><a href="#">New Arrivals</a></li>
+                    <li><a asp-controller="Home" asp-action="Sales" class="@(ViewContext.RouteData.Values["Action"].ToString() == "Sales" ? "active" : "")">Sale</a></li>
+                    <li><a asp-controller="Home" asp-action="About" class="@(ViewContext.RouteData.Values["Action"].ToString() == "About" ? "active" : "")">About</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-icons">
+                <a href="#" class="search-icon"><i class="fas fa-search"></i></a>
+
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Account" asp-action="Login" class="user-icon"><i class="fas fa-user"></i></a>
+                }
+                else
+                {
+                    <div class="user-dropdown">
+                        <a href="#" class="user-profile">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="user-name">@User.Identity.Name</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="/Account/Profile" class="dropdown-item">
+                                <i class="fas fa-user"></i> My Profile
+                            </a>
+                            <a href="/Account/Orders" class="dropdown-item">
+                                <i class="fas fa-shopping-bag"></i> My Orders
+                            </a>
+                            <a href="/Account/Wishlist" class="dropdown-item">
+                                <i class="fas fa-heart"></i> Wishlist
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="logout-form">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="dropdown-item logout-btn">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+
+                @await Component.InvokeAsync("CartCount")
+            </div>
+        </div>
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>Elegant Stitch</h3>
+                <p>We bring you the finest collection of gents suits, combining traditional craftsmanship with contemporary designs for the modern woman.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <a href="/">Home</a><br>
+                <a asp-controller="Home" asp-action="Collections">Collections</a><br>
+                <a asp-controller="Home" asp-action="Featured">Featured</a><br>
+                <a href="#">New Arrivals</a><br>
+                <a href="#">Sale</a>
+            </div>
+
+            <div class="footer-col">
+                <h3>Customer Service</h3>
+                <a href="#">Contact Us</a><br>
+                <a href="#">FAQs</a><br>
+                <a href="#">Shipping Policy</a><br>
+                <a href="#">Return & Exchange</a><br>
+                <a href="#">Size Guide</a>
+            </div>
+
+            <div class="footer-col">
+                <h3>Contact Info</h3>
+                <p><i class="fas fa-map-marker-alt"></i> 123 Fashion Street, Mumbai, India</p>
+                <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                <p><i class="fas fa-envelope"></i> info@elegantstitch.com</p>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>&copy; @DateTime.Now.Year Elegant Stitch. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="~/user/script.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

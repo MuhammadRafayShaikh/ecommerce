@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Premium gents Suits";
+    Layout = "_Layout";
+    List<int> productIds = TempData["cartProducts"] as List<int>;
+}
+@model E_Commerce.Models.HomeViewModel
+@section Styles {
+    <link rel="stylesheet" href="~/user/featured/featured.css" asp-append-version="true">
+}
+
+
+
+
+<!-- Featured Page Content -->
+<div class="featured-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Featured Collections</h1>
+        <p>Discover our handpicked selection of premium gents suits, carefully curated to bring you the finest designs, exclusive discounts, and latest trends in men's fashion.</p>
+    </div>
+
+   
+
+    <!-- Spotlight Section -->
+    @await Html.PartialAsync("~/Views/Home/FeaturedPartial/_FeaturedCards.cshtml")
+
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <a href="#" class="prev"><i class="fas fa-chevron-left"></i> Previous</a>
+        <a href="#" class="active">1</a>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#">4</a>
+        <a href="#">5</a>
+        <a href="#" class="next">Next <i class="fas fa-chevron-right"></i></a>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/user/featured/featured.js" asp-append-version="true"></script>
+}

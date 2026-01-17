@@ -1,0 +1,187 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+@model E_Commerce.Models.Product
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Header -->
+    @await Html.PartialAsync("_AdminProductHeader")
+
+    <!-- Add Product Page -->
+    <div class="page-container active" id="addProductPage">
+        <div class="add-product-container">
+            <div class="form-header">
+                <h2><i class="fas fa-plus-circle"></i> Add New Product</h2>
+                <div class="product-count">
+                    <span class="badge">Total Products: <strong id="totalProducts">18</strong></span>
+                </div>
+            </div>
+
+            <form id="productForm" asp-controller="Product" asp-action="Add" method="post" enctype="multipart/form-data" onsubmit="return submitForm(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Name">Product Name <span class="required">*</span></label>
+                        <input id="productName" asp-for="Name" class="form-control" placeholder="e.g., Royal Blue Anarkali Suit" required>
+                        <span asp-validation-for="Name"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CategoryId">Category <span class="required">*</span></label>
+                        <select asp-for="CategoryId" id="productCategory" class="form-control" required>
+                            <option selected disabled>Select Category</option>
+                            @foreach (var categories in ViewData["categories"] as List<Category>)
+                            {
+                                <option value="@categories.Id">@categories.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CategoryId"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Price">Base Price (₹) <span class="required">*</span></label>
+                        <input asp-for="Price" id="productPrice" class="form-control" placeholder="e.g., 3999" min="0" step="0.01" required>
+                        <span asp-validation-for="Price"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SKU">Product Code / SKU <span class="required">*</span></label>
+                        <input asp-for="SKU" id="productSKU" class="form-control" placeholder="e.g., LS-AN-001" required>
+                        <span asp-validation-for="SKU"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Brand">Brand</label>
+                        <input asp-for="Brand" id="productBrand" class="form-control" placeholder="e.g., Luxe Suits">
+                        <span asp-validation-for="Brand"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Availability">Availability</label>
+                        <select id="productAvailability" asp-for="Availability" class="form-control">
+                            <option value="in-stock">In Stock</option>
+                            <option value="out-of-stock">Out of Stock</option>
+                            <option value="pre-order">Pre-Order</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CareInstruction">Care Instruction</label>
+                    <textarea asp-for="CareInstruction" id="shortDescription" class="form-control" placeholder="Brief Care Instruction of the product (max 200 characters)" maxlength="200"></textarea>
+                    <span asp-validation-for="CareInstruction"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ShortDescription">Short Description</label>
+                    <textarea asp-for="ShortDescription" id="shortDescription" class="form-control" placeholder="Brief description of the product (max 200 characters)" maxlength="200"></textarea>
+                    <span asp-validation-for="ShortDescription"></span>
+                </div>
+
+                <div class="form-group full-width">
+                    <label asp-for="FullDescription">Product Complete Details</label>
+                    <textarea asp-for="FullDescription" id="fullDescription" class="form-control" placeholder="Complete description including fabric, work, design, occasion, etc." rows="4"></textarea>
+                    <span asp-validation-for="FullDescription"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Weight">Weight (grams)</label>
+                        <input asp-for="Weight" id="productWeight" class="form-control" placeholder="e.g., 850" min="0">
+                        <span asp-validation-for="Weight"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Fabric">Fabric</label>
+                        <input asp-for="Fabric" id="productFabric" class="form-control" placeholder="e.g., Silk, Georgette, Chiffon">
+                        <span asp-validation-for="Fabric"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Occasion">Occasion</label>
+                        <input asp-for="Occasion" id="productOccasion" class="form-control" placeholder="e.g., Weddings, Festivals, Parties">
+                        <span asp-validation-for="Occasion"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="IsActive">Status</label>
+                        <select asp-for="IsActive" id="productStatus" class="form-control">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <input type="hidden" name="ColorVariantsJson" id="ColorVariantsJson" />
+
+                <!-- Color Selection Section -->
+                <div class="form-group full-width">
+                    <label>Select Colors (Click to add color variant)</label>
+                    <div class="selection-container" id="colorSelection">
+                        <div class="selection-item" data-value="Red" data-color="#f44336">
+                            <div class="color-box" style="background-color: #f44336;"></div>
+                            Red
+                        </div>
+                        <div class="selection-item" data-value="Blue" data-color="#2196f3">
+                            <div class="color-box" style="background-color: #2196f3;"></div>
+                            Blue
+                        </div>
+                        <div class="selection-item" data-value="Green" data-color="#4caf50">
+                            <div class="color-box" style="background-color: #4caf50;"></div>
+                            Green
+                        </div>
+                        <div class="selection-item" data-value="Black" data-color="#333">
+                            <div class="color-box" style="background-color: #333;"></div>
+                            Black
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Color Sections Container -->
+                <div id="colorSectionsContainer">
+                    <!-- Color sections will be added here dynamically -->
+                </div>
+
+                <!-- Product Images (for non-color specific images) -->
+                <!-- Product Videos -->
+                <div class="form-group full-width">
+                    <label>Product Videos (1–2 recommended)</label>
+                    <div class="image-upload-section">
+                        <div class="image-preview-container" id="videoPreviewContainer">
+                            <!-- JS will render -->
+                        </div>
+
+                        <input type="file"
+                               id="videoUploadInput"
+                               accept="video/mp4,video/webm,video/avi"
+                               multiple
+                               style="display:none"
+                               onchange="handleVideoUpload(event)">
+                    </div>
+                </div>
+
+                
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="resetProductForm()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                    <button type="submit" class="btn btn-success" id="submitBtn">
+                        <i class="fas fa-check"></i> Add Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="~/admin/product.js"></script>
+    
+    <!-- View Products Page -->
+    @if (TempData["error"] != null)
+    {
+        <script>
+            showNotification("@TempData["error"]", "warning");
+        </script>
+    }
+    
+
+    
