@@ -412,5 +412,10 @@ namespace E_Commerce.Controllers
 
             return View(viewModel);
         }
+
+        public ViewResult About()
+        {
+            return View();
+        }
     }
 }

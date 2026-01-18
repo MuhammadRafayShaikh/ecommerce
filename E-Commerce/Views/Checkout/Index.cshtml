@@ -1,0 +1,312 @@
+﻿@model E_Commerce.Models.Order
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Checkout";
+}
+<link rel="stylesheet" href="~/user/checkout/checkout.css" />
+<!-- Checkout Page Content -->
+<div class="checkout-container" style="margin-top: 80px;">
+    <!-- Progress Steps -->
+    <div class="checkout-steps">
+        <div class="step active">
+            <div class="step-number">1</div>
+            <div class="step-label">Shipping</div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-label">Payment</div>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-label">Confirmation</div>
+        </div>
+    </div>
+
+    <div class="checkout-content">
+        <!-- Left Column: Shipping & Payment -->
+        <div class="checkout-form-section">
+            <!-- Order Summary Card -->
+            <div class="order-summary-card">
+                <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+                <div class="summary-details">
+                    <div class="summary-row">
+                        <span>Order #</span>
+                        <span class="order-number">@Model.OrderNumber</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Date</span>
+                        <span>@Model.CreatedAt.ToString("MMM dd, yyyy")</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Status</span>
+                        <span class="status-badge pending">@Model.Status.ToString()</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Address Form -->
+            <div class="shipping-address-form" id="shippingForm">
+                <h3><i class="fas fa-shipping-fast"></i> Shipping Address</h3>
+
+                <form id="addressForm">
+                    <input type="hidden" id="orderId" value="@Model.Id" />
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName">Full Name *</label>
+                            <input type="text" id="fullName" name="fullName" required
+                                   placeholder="Enter your full name"
+                                   value="@(ViewBag.DefaultAddress?.FullName ?? "")">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" required
+                                   placeholder="Enter your phone number"
+                                   value="@(ViewBag.DefaultAddress?.Phone ?? "")">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addressLine">Address Line *</label>
+                        <input type="text" id="addressLine" name="addressLine" required
+                               placeholder="House No, Street, Area"
+                               value="@(ViewBag.DefaultAddress?.AddressLine ?? "")">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" id="city" name="city" required
+                                   placeholder="Enter your city"
+                                   value="@(ViewBag.DefaultAddress?.City ?? "")">
+                        </div>
+                        <div class="form-group">
+                            <label for="postalCode">Postal Code *</label>
+                            <input type="text" id="postalCode" name="postalCode" required
+                                   placeholder="Enter postal code"
+                                   value="@(ViewBag.DefaultAddress?.PostalCode ?? "")">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-continue" id="saveAddressBtn">
+                        <i class="fas fa-save"></i> Save & Continue to Payment
+                    </button>
+                </form>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="payment-methods" id="paymentSection" style="display: none;">
+                <h3><i class="fas fa-credit-card"></i> Payment Method</h3>
+
+                <div class="payment-options">
+                    <div class="payment-option active" data-provider="stripe">
+                        <div class="payment-icon">
+                            <i class="fab fa-cc-stripe"></i>
+                        </div>
+                        <div class="payment-info">
+                            <h4>Credit/Debit Card</h4>
+                            <p>Pay securely with your card</p>
+                        </div>
+                        <div class="payment-check">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+
+                    <div class="payment-option" data-provider="jazzcash">
+                        <div class="payment-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="payment-info">
+                            <h4>JazzCash</h4>
+                            <p>Pay via JazzCash wallet</p>
+                        </div>
+                        <div class="payment-check">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+
+                    <div class="payment-option" data-provider="easypaisa">
+                        <div class="payment-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="payment-info">
+                            <h4>EasyPaisa</h4>
+                            <p>Pay via EasyPaisa wallet</p>
+                        </div>
+                        <div class="payment-check">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+
+                    <div class="payment-option" data-provider="cod">
+                        <div class="payment-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="payment-info">
+                            <h4>Cash on Delivery</h4>
+                            <p>Pay when you receive the order</p>
+                        </div>
+                        <div class="payment-check">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Details (for Stripe) -->
+                <div class="card-details" id="cardDetails">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cardNumber">Card Number *</label>
+                            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expiryDate">Expiry Date *</label>
+                            <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV *</label>
+                            <input type="password" id="cvv" placeholder="123" maxlength="4">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cardHolder">Card Holder Name *</label>
+                        <input type="text" id="cardHolder" placeholder="Name on card">
+                    </div>
+                </div>
+
+                <!-- Mobile Wallet Details (for JazzCash/EasyPaisa) -->
+                <div class="wallet-details" id="walletDetails" style="display: none;">
+                    <div class="form-group">
+                        <label for="mobileNumber">Mobile Number *</label>
+                        <input type="tel" id="mobileNumber" placeholder="03XX-XXXXXXX">
+                    </div>
+                    <div class="form-group">
+                        <label for="pinCode">PIN Code *</label>
+                        <input type="password" id="pinCode" placeholder="Enter 4-digit PIN" maxlength="4">
+                    </div>
+                </div>
+
+                <!-- COD Note -->
+                <div class="cod-note" id="codNote" style="display: none;">
+                    <div class="note-box">
+                        <i class="fas fa-info-circle"></i>
+                        <p>You will pay cash when you receive the order. An additional ₹50 will be charged for COD service.</p>
+                    </div>
+                </div>
+
+                <button class="btn-pay-now" id="payNowBtn">
+                    <i class="fas fa-lock"></i> Complete Payment
+                </button>
+
+                <div class="secure-payment">
+                    <i class="fas fa-shield-alt"></i> Your payment is secured with SSL encryption
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Order Summary -->
+        <div class="checkout-summary-section">
+            <div class="summary-card">
+                <h3><i class="fas fa-shopping-bag"></i> Order Details</h3>
+
+                <div class="order-items">
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="order-item">
+                            <div class="item-image"
+                                 style="background-image: url('/ProductImages/@item.Product?.ProductColors?.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()')">
+                            </div>
+                            <div class="item-details">
+                                <h4>@item.Product?.Name</h4>
+                                <div class="item-attributes">
+                                    <span class="size-badge">@item.Size</span>
+                                    @if (item.ProductColor != null)
+                                    {
+                                        <span class="color-dot-small"
+                                              style="background-color: @item.ProductColor.ColorCode"></span>
+                                        <span>@item.ProductColor.ColorName</span>
+                                    }
+                                </div>
+                                <div class="item-quantity">
+                                    <span>Qty: @item.Quantity</span>
+                                    <span class="item-price">₹@item.UnitPrice.ToString("N0") each</span>
+                                </div>
+                            </div>
+                            <div class="item-total">
+                                ₹@item.TotalPrice.ToString("N0")
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="price-breakdown">
+                    <div class="price-row">
+                        <span>Subtotal</span>
+                        <span>₹@Model.SubTotal.ToString("N0")</span>
+                    </div>
+
+                    @if (Model.DiscountTotal > 0)
+                    {
+                        <div class="price-row discount">
+                            <span>Discount</span>
+                            <span>- ₹@Model.DiscountTotal.ToString("N0")</span>
+                        </div>
+                    }
+
+                    <div class="price-row">
+                        <span>Shipping</span>
+                        <span>₹@Model.Shipping.ToString("N0")</span>
+                    </div>
+
+                    <div class="price-row total">
+                        <span>Grand Total</span>
+                        <span>₹@Model.GrandTotal.ToString("N0")</span>
+                    </div>
+                </div>
+
+                <div class="delivery-info">
+                    <div class="info-item">
+                        <i class="fas fa-truck"></i>
+                        <div>
+                            <h5>Delivery Estimate</h5>
+                            <p>3-5 business days</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-undo"></i>
+                        <div>
+                            <h5>Easy Returns</h5>
+                            <p>15 days return policy</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-card">
+                <h4><i class="fas fa-question-circle"></i> Need Help?</h4>
+                <p>Call us at <strong>0315-3307757</strong></p>
+                <p>Email: <strong>support@ecommerce.com</strong></p>
+                <p>We're available 24/7</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <p id="loadingText">Processing...</p>
+    </div>
+</div>
+
+<!-- Custom Notification Toast -->
+@await Html.PartialAsync("_Toast")
+
+@section Scripts {
+    <script src="~/user/checkout/checkout.js"></script>
+}

@@ -1,0 +1,347 @@
+﻿@model E_Commerce.Models.Order
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Order Details";
+}
+<link rel="stylesheet" href="~/user/order/orders.css">
+<!-- Order Details Page -->
+<div class="order-details-container" style="margin-top: 80px;">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a asp-controller="Order" asp-action="MyOrders"><i class="fas fa-arrow-left"></i> Back to Orders</a>
+    </div>
+
+    <!-- Order Header -->
+    <div class="order-header-card">
+        <div class="header-left">
+            <h1>Order #@Model.OrderNumber</h1>
+            <div class="order-meta">
+                <span class="date">
+                    <i class="far fa-calendar-alt"></i>
+                    Placed on @Model.CreatedAt.ToString("MMMM dd, yyyy")
+                </span>
+                <span class="time">
+                    <i class="far fa-clock"></i>
+                    @Model.CreatedAt.ToString("hh:mm tt")
+                </span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-display">
+                <span class="status-badge @Model.Status">
+                    <i class="@Model.Status"></i>
+                    @Model.Status.ToString()
+                </span>
+            </div>
+            @if (Model.Status == Order.OrderStatus.Pending || Model.Status == Order.OrderStatus.Cancelled)
+            {
+                <button class="btn-retry-payment" data-order-id="@Model.Id">
+                    <i class="fas fa-credit-card"></i> Retry Payment
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="order-content">
+        <!-- Left Column: Order Items & Timeline -->
+        <div class="order-main">
+            <!-- Order Timeline -->
+            <div class="timeline-card">
+                <h3><i class="fas fa-history"></i> Order Timeline</h3>
+                <div class="timeline">
+                    <div class="timeline-step @(Model.Status >= Order.OrderStatus.Pending ? "completed" : "")">
+                        <div class="step-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="step-content">
+                            <h4>Order Placed</h4>
+                            <p>We have received your order</p>
+                            <span class="step-date">@Model.CreatedAt.ToString("MMM dd, hh:mm tt")</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-step @(Model.Status >= Order.OrderStatus.Confirmed ? "completed" : "")">
+                        <div class="step-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="step-content">
+                            <h4>Payment @(Model.Status >= Order.OrderStatus.Confirmed ? "Confirmed" : "Pending")</h4>
+                            @if (Model.Status >= Order.OrderStatus.Confirmed)
+                            {
+                                <p>Payment processed successfully</p>
+                                <span class="step-date">@Model.CreatedAt.AddHours(1).ToString("MMM dd, hh:mm tt")</span>
+                            }
+                            else
+                            {
+                                <p>Awaiting payment confirmation</p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="timeline-step @(Model.Status >= Order.OrderStatus.Shipped ? "completed" : "")">
+                        <div class="step-icon">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div class="step-content">
+                            <h4>@(Model.Status >= Order.OrderStatus.Shipped ? "Shipped" : "Processing")</h4>
+                            @if (Model.Status >= Order.OrderStatus.Shipped)
+                            {
+                                <p>Your order is on the way</p>
+                                <span class="step-date">@Model.CreatedAt.AddDays(1).ToString("MMM dd, hh:mm tt")</span>
+                            }
+                            else
+                            {
+                                <p>Preparing your order</p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="timeline-step @(Model.Status >= Order.OrderStatus.Delivered ? "completed" : "")">
+                        <div class="step-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div class="step-content">
+                            <h4>@(Model.Status >= Order.OrderStatus.Delivered ? "Delivered" : "Delivery")</h4>
+                            @if (Model.Status >= Order.OrderStatus.Delivered)
+                            {
+                                <p>Your order has been delivered</p>
+                                <span class="step-date">@Model.CreatedAt.AddDays(3).ToString("MMM dd, hh:mm tt")</span>
+                            }
+                            else
+                            {
+                                <p>Estimated delivery: @DateTime.Now.AddDays(2).ToString("MMM dd, yyyy")</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="items-card">
+                <h3><i class="fas fa-boxes"></i> Order Items</h3>
+                <div class="items-list">
+                    @foreach (var item in Model.Items)
+                    {
+                        var productColor = item.ProductColor;
+                        <div class="order-item-detail">
+                            <div class="item-image"
+                                 style="background-image: url('/ProductImages/@item.Product?.ProductColors?.FirstOrDefault(pc => pc.Id == item.ProductColorId)?.Images?.FirstOrDefault()?.ImagePath')">
+                            </div>
+                            <div class="item-info">
+                                <h4>@item.Product?.Name</h4>
+                                <div class="item-specs">
+                                    @if (productColor != null)
+                                    {
+                                        <span class="spec">
+                                            <span class="color-dot" style="background-color: @productColor.ColorCode"></span>
+                                            @productColor.ColorName
+                                        </span>
+                                    }
+                                    <span class="spec">
+                                        <i class="fas fa-ruler"></i> Size: @item.Size
+                                    </span>
+                                    <span class="spec">
+                                        <i class="fas fa-layer-group"></i> Qty: @item.Quantity
+                                    </span>
+                                    <span class="spec">
+                                        <i class="fas fa-tag"></i> ₹@item.UnitPrice.ToString("N0") each
+                                    </span>
+                                </div>
+
+                                @if (Model.Status == Order.OrderStatus.Delivered)
+                                {
+                                    <div class="item-actions">
+                                        <button class="btn-review-item" data-product-id="@item.ProductId">
+                                            <i class="fas fa-star"></i> Write Review
+                                        </button>
+                                        <button class="btn-buy-again" data-product-id="@item.ProductId">
+                                            <i class="fas fa-sync"></i> Buy Again
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                            <div class="item-price">
+                                <div class="price">₹@item.TotalPrice.ToString("N0")</div>
+                                @if (item.Quantity > 1)
+                                {
+                                    <div class="unit-price">₹@item.UnitPrice.ToString("N0") × @item.Quantity</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            @if (Model.OrderAddress != null)
+            {
+                <div class="address-card">
+                    <h3><i class="fas fa-map-marker-alt"></i> Shipping Address</h3>
+                    <div class="address-details">
+                        <div class="address-info">
+                            <h4>@Model.OrderAddress.FullName</h4>
+                            <p>@Model.OrderAddress.AddressLine</p>
+                            <p>@Model.OrderAddress.City - @Model.OrderAddress.PostalCode</p>
+                            <p><i class="fas fa-phone"></i> @Model.OrderAddress.Phone</p>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Payment Information -->
+            @if (Model.Payments != null && Model.Payments.Any())
+            {
+                <div class="payment-card">
+                    <h3><i class="fas fa-credit-card"></i> Payment Information</h3>
+                    <div class="payment-details">
+                        @foreach (var payment in Model.Payments.OrderByDescending(p => p.CreatedAt))
+                        {
+                            <div class="payment-item">
+                                <div class="payment-method">
+                                    <div class="payment-icon">
+                                        @if (payment.Provider.ToLower().Contains("stripe"))
+                                        {
+                                            <i class="fab fa-cc-stripe"></i>
+                                        }
+                                        else if (payment.Provider.ToLower().Contains("jazz"))
+                                        {
+                                            <i class="fas fa-mobile-alt"></i>
+                                        }
+                                        else if (payment.Provider.ToLower().Contains("easy"))
+                                        {
+                                            <i class="fas fa-wallet"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-money-bill-wave"></i>
+                                        }
+                                    </div>
+                                    <div class="payment-info">
+                                        <h4>@payment.Provider</h4>
+                                        <p>Transaction ID: @payment.TransactionId</p>
+                                        <span class="payment-date">@payment.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")</span>
+                                    </div>
+                                </div>
+                                <div class="payment-status">
+                                    <span class="status-badge @(payment.Status == Payment.PaymentStatus.Success ? "success" :
+                                                               payment.Status == Payment.PaymentStatus.Failed ? "failed" : "initiated")">
+                                        @payment.Status.ToString()
+                                    </span>
+                                    <div class="payment-amount">₹@payment.Amount.ToString("N0")</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Right Column: Order Summary & Actions -->
+        <div class="order-sidebar">
+            <!-- Order Summary Card -->
+            <div class="summary-card">
+                <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+                <div class="summary-details">
+                    <div class="summary-row">
+                        <span>Items Total</span>
+                        <span>₹@Model.SubTotal.ToString("N0")</span>
+                    </div>
+
+                    @if (Model.DiscountTotal > 0)
+                    {
+                        <div class="summary-row discount">
+                            <span>Discount</span>
+                            <span>-₹@Model.DiscountTotal.ToString("N0")</span>
+                        </div>
+                    }
+
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span>₹@Model.Shipping.ToString("N0")</span>
+                    </div>
+
+                    <div class="summary-row total">
+                        <span>Grand Total</span>
+                        <span class="grand-total">₹@Model.GrandTotal.ToString("N0")</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Actions -->
+            <div class="actions-card">
+                <h3><i class="fas fa-cog"></i> Order Actions</h3>
+                <div class="action-buttons">
+                    <a href="/Orders/Track/@Model.Id" class="btn-action primary">
+                        <i class="fas fa-map-marker-alt"></i> Track Order
+                    </a>
+
+                    @if (Model.Status == Order.OrderStatus.Pending || Model.Status == Order.OrderStatus.Cancelled)
+                    {
+                        <button class="btn-action success btn-retry-payment" data-order-id="@Model.Id">
+                            <i class="fas fa-redo"></i> Retry Payment
+                        </button>
+                    }
+
+                    @if (Model.Status == Order.OrderStatus.Pending)
+                    {
+                        <button class="btn-action danger btn-cancel-order" data-order-id="@Model.Id">
+                            <i class="fas fa-times"></i> Cancel Order
+                        </button>
+                    }
+
+                    @if (Model.Status == Order.OrderStatus.Delivered)
+                    {
+                        <button class="btn-action secondary">
+                            <i class="fas fa-star"></i> Write Review
+                        </button>
+
+                        <button class="btn-action secondary">
+                            <i class="fas fa-sync"></i> Reorder All
+                        </button>
+
+                        <button class="btn-action secondary">
+                            <i class="fas fa-download"></i> Download Invoice
+                        </button>
+                    }
+
+                    <a asp-controller="Home" asp-action="Collections" class="btn-action secondary">
+                        <i class="fas fa-shopping-cart"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+
+            <!-- Customer Support -->
+            <div class="support-card">
+                <h3><i class="fas fa-headset"></i> Need Help?</h3>
+                <div class="support-info">
+                    <p>Having issues with your order?</p>
+                    <div class="contact-options">
+                        <a href="tel:03001234567" class="contact-link">
+                            <i class="fas fa-phone"></i> Call Support
+                        </a>
+                        <a href="mailto:support@ecommerce.com" class="contact-link">
+                            <i class="fas fa-envelope"></i> Email Us
+                        </a>
+                        <a href="/Help/Chat" class="contact-link">
+                            <i class="fas fa-comment-dots"></i> Live Chat
+                        </a>
+                    </div>
+                    <p class="support-note">
+                        <i class="fas fa-info-circle"></i>
+                        Our support team is available 24/7
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+@await Html.PartialAsync("_Confirmation")
+
+<!-- Toast Notification -->
+@await Html.PartialAsync("_Toast")
+
+
+
+    <script src="~/user/order/orders.js"></script>

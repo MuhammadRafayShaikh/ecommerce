@@ -3,6 +3,7 @@ let currentEditProduct = null;
 let availableColors = [];
 let currentSelections = {};
 let productDiscount = null;
+let colorStocks = {};
 
 // ====== HELPER FUNCTIONS FOR DISCOUNT ======
 
@@ -52,6 +53,199 @@ function getPriceDisplay(basePrice, originalPrice, discountType, discountValue) 
         return `₹${basePrice.toLocaleString('en-IN')}`;
     }
 }
+
+// ====== HELPER FUNCTIONS FOR STOCK MANAGEMENT ======
+
+// Calculate total selected quantity for a color
+function getTotalSelectedForColor(colorId) {
+    if (!currentSelections[colorId]) return 0;
+
+    let total = 0;
+    for (const size in currentSelections[colorId]) {
+        total += currentSelections[colorId][size].quantity;
+    }
+    return total;
+}
+
+// Get available stock for a color
+function getAvailableStockForColor(colorId) {
+    if (!colorStocks[colorId]) return 0;
+    return colorStocks[colorId].availableStock;
+}
+
+// Get remaining stock for a color
+function getRemainingStockForColor(colorId) {
+    const totalStock = getAvailableStockForColor(colorId);
+    const selected = getTotalSelectedForColor(colorId);
+    return Math.max(0, totalStock - selected);
+}
+
+// Check if a color has available stock for given quantity
+function canAddSizeToColor(colorId, size, requestedQuantity = 1) {
+    const currentSizeQuantity = currentSelections[colorId] && currentSelections[colorId][size]
+        ? currentSelections[colorId][size].quantity
+        : 0;
+
+    const otherSizesTotal = Object.keys(currentSelections[colorId] || {})
+        .filter(s => s !== size)
+        .reduce((sum, s) => sum + (currentSelections[colorId][s]?.quantity || 0), 0);
+
+    const totalAfterRequest = otherSizesTotal + requestedQuantity;
+    return totalAfterRequest <= getAvailableStockForColor(colorId);
+}
+
+// Update color stock display in UI
+function updateColorStockDisplay(colorId) {
+    const colorOption = document.querySelector(`.color-option[data-color-id="${colorId}"]`);
+    if (colorOption) {
+        const stockElement = colorOption.querySelector('.color-stock-info');
+        if (stockElement) {
+            const remaining = getRemainingStockForColor(colorId);
+            const totalStock = getAvailableStockForColor(colorId);
+            stockElement.querySelector('small').innerHTML = `
+                Stock: ${totalStock} | Remaining: <span style="color: ${remaining > 0 ? '#4CAF50' : '#ff4444'}">${remaining}</span>
+            `;
+        }
+    }
+}
+
+// Update stock display for all quantity inputs of a color
+function updateStockDisplayForColor(colorId) {
+    const remainingStock = getRemainingStockForColor(colorId);
+
+    // Update in color option
+    const colorOption = document.querySelector(`.color-option[data-color-id="${colorId}"]`);
+    if (colorOption) {
+        const stockElement = colorOption.querySelector('.color-stock-info');
+        if (stockElement) {
+            const colorData = availableColors.find(c => c.id == colorId);
+            const totalStock = colorData?.stock || 0;
+            stockElement.querySelector('small').innerHTML = `
+                Stock: ${totalStock} | Remaining: <span style="color: ${remainingStock > 0 ? '#4CAF50' : '#ff4444'}">${remainingStock}</span>
+            `;
+        }
+    }
+
+    // Update in size group header
+    const availableStockElement = document.querySelector(`#available-stock-${colorId}`);
+    if (availableStockElement) {
+        availableStockElement.textContent = remainingStock;
+        availableStockElement.style.color = remainingStock > 0 ? '#4CAF50' : '#ff4444';
+    }
+
+    // Update max values for all quantity inputs of this color
+    const quantityInputs = document.querySelectorAll(`.size-quantity-input[data-color-id="${colorId}"]`);
+    const colorData = availableColors.find(c => c.id == colorId);
+    const totalStock = colorData?.stock || 0;
+
+    quantityInputs.forEach(input => {
+        const size = input.dataset.size;
+        const currentSizeQuantity = currentSelections[colorId] && currentSelections[colorId][size]
+            ? currentSelections[colorId][size].quantity
+            : 0;
+
+        // Calculate available for this specific size
+        const otherSizesTotal = Object.keys(currentSelections[colorId] || {})
+            .filter(s => s !== size)
+            .reduce((sum, s) => sum + (currentSelections[colorId][s]?.quantity || 0), 0);
+
+        const maxForThisSize = totalStock - otherSizesTotal;
+        input.max = maxForThisSize;
+
+        // Update the stock note
+        const stockNote = input.parentElement.querySelector('.stock-note');
+        if (stockNote) {
+            stockNote.innerHTML = `Max: ${maxForThisSize} (${remainingStock} remaining)`;
+        }
+
+        // If current quantity exceeds new max, adjust it
+        if (currentSizeQuantity > maxForThisSize) {
+            input.value = maxForThisSize;
+            if (currentSelections[colorId] && currentSelections[colorId][size]) {
+                currentSelections[colorId][size].quantity = maxForThisSize;
+            }
+        }
+    });
+}
+
+// ====== TOAST AND CONFIRMATION FUNCTIONS ======
+
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+
+    if (!toast || !toastMessage) return;
+
+    toastMessage.textContent = message;
+    toast.className = `toast show ${type}`;
+
+    setTimeout(() => {
+        toast.className = toast.className.replace('show', '');
+    }, 3000);
+}
+
+function hideToast() {
+    const toast = document.getElementById('toast');
+    if (toast) {
+        toast.className = toast.className.replace('show', '');
+    }
+}
+
+//async function showConfirm(title, message) {
+//    return new Promise((resolve) => {
+//        const modal = document.getElementById('confirmationModal');
+//        const modalTitle = document.getElementById('modalTitle');
+//        const modalMessage = document.getElementById('modalMessage');
+//        const confirmBtn = document.getElementById('confirmBtn');
+//        const cancelBtn = document.getElementById('cancelBtn');
+
+//        if (!modal || !modalTitle || !modalMessage) {
+//            resolve(false);
+//            return;
+//        }
+
+//        modalTitle.textContent = title;
+//        modalMessage.textContent = message;
+//        modal.style.display = 'block';
+//        document.body.style.overflow = 'hidden';
+
+//        const handleConfirm = () => {
+//            cleanup();
+//            resolve(true);
+//        };
+
+//        const handleCancel = () => {
+//            cleanup();
+//            resolve(false);
+//        };
+
+//        const handleOverlayClick = (e) => {
+//            if (e.target === modal || e.target.classList.contains('modal-overlay')) {
+//                handleCancel();
+//            }
+//        };
+
+//        const handleEscape = (e) => {
+//            if (e.key === 'Escape') {
+//                handleCancel();
+//            }
+//        };
+
+//        function cleanup() {
+//            modal.style.display = 'none';
+//            document.body.style.overflow = 'auto';
+//            confirmBtn.removeEventListener('click', handleConfirm);
+//            cancelBtn.removeEventListener('click', handleCancel);
+//            modal.removeEventListener('click', handleOverlayClick);
+//            document.removeEventListener('keydown', handleEscape);
+//        }
+
+//        confirmBtn.addEventListener('click', handleConfirm);
+//        cancelBtn.addEventListener('click', handleCancel);
+//        modal.addEventListener('click', handleOverlayClick);
+//        document.addEventListener('keydown', handleEscape);
+//    });
+//}
 
 // ====== INITIALIZATION ======
 document.addEventListener('DOMContentLoaded', function () {
@@ -144,10 +338,22 @@ function fetchProductData(productId) {
 // Initialize current selections from cart
 function initializeCurrentSelections(selections) {
     currentSelections = {};
+    colorStocks = {};
 
     if (!Array.isArray(selections)) {
         console.warn('Selections is not an array:', selections);
         selections = [];
+    }
+
+    // Initialize color stocks
+    if (Array.isArray(availableColors)) {
+        availableColors.forEach(color => {
+            if (color && color.id) {
+                colorStocks[color.id] = {
+                    availableStock: color.stock || 0
+                };
+            }
+        });
     }
 
     selections.forEach(selection => {
@@ -167,13 +373,19 @@ function initializeCurrentSelections(selections) {
             currentSelections[colorId] = {};
         }
 
-        currentSelections[colorId][size] = {
-            quantity: parseInt(quantity) || 1,
-            unitPrice: parseFloat(unitPrice) || 0
-        };
+        // Check if we can add this selection based on stock
+        if (canAddSizeToColor(colorId, size, quantity)) {
+            currentSelections[colorId][size] = {
+                quantity: parseInt(quantity) || 1,
+                unitPrice: parseFloat(unitPrice) || 0
+            };
+        } else {
+            console.warn(`Cannot add selection: color ${colorId}, size ${size}, quantity ${quantity} exceeds stock`);
+        }
     });
 
     console.log('Initialized currentSelections:', currentSelections);
+    console.log('Color stocks:', colorStocks);
 }
 
 // Populate edit modal with discount information
@@ -220,7 +432,7 @@ function populateEditModal() {
     updateEditTotalPrice();
 }
 
-// Populate color options in edit modal with discount-aware pricing
+// Populate color options in edit modal with discount-aware pricing and stock info
 function populateEditColorOptions() {
     const container = document.getElementById('editColorOptions');
     if (!container) return;
@@ -245,9 +457,17 @@ function populateEditColorOptions() {
         colorOption.dataset.colorId = color.id;
         colorOption.dataset.colorName = color.name;
         colorOption.dataset.extraPrice = color.extraPrice || 0;
+        colorOption.dataset.stock = color.stock || 0;
 
         const isSelected = currentSelections[color.id] && Object.keys(currentSelections[color.id]).length > 0;
         if (isSelected) colorOption.classList.add('selected');
+
+        // Disable if out of stock
+        if (color.stock <= 0) {
+            colorOption.classList.add('out-of-stock');
+            colorOption.style.opacity = '0.5';
+            colorOption.style.pointerEvents = 'none';
+        }
 
         const extraPrice = color.extraPrice || 0;
         const finalPrice = basePrice + extraPrice;
@@ -258,17 +478,20 @@ function populateEditColorOptions() {
             extraPriceHtml = `<span class="extra-price-tag">+₹${extraPrice}</span>`;
         }
 
-        // Safely get sizes
         const sizes = Array.isArray(color.sizes) ? color.sizes :
             (typeof color.sizes === 'string' ? color.sizes.split(',').map(s => s.trim()) : []);
 
-        // Display price for this color
         const colorPriceDisplay = getPriceDisplay(
             finalPrice,
             originalItemPrice,
             discountType,
             discountValue
         );
+
+        const remainingStock = getRemainingStockForColor(color.id);
+        const stockDisplay = remainingStock <= 0 && color.stock > 0
+            ? `<span style="color: #ff4444;">Out of stock</span>`
+            : `Stock: ${color.stock} | Remaining: <span style="color: #4CAF50;">${remainingStock}</span>`;
 
         colorOption.innerHTML = `
             <div class="color-dot-large" style="background-color: ${color.code || '#ccc'}"></div>
@@ -277,18 +500,23 @@ function populateEditColorOptions() {
                 <div class="color-price">
                     ${colorPriceDisplay}
                 </div>
-                <div class="color-stock">
+                <div class="color-stock-info">
                     ${extraPriceHtml}
+                    <br>
+                    <small>${stockDisplay}</small>
                     <br>
                     <small>Available sizes: ${sizes.join(', ') || 'N/A'}</small>
                 </div>
             </div>
         `;
 
-        colorOption.addEventListener('click', function () {
-            const colorId = this.dataset.colorId;
-            toggleColorSelection(colorId);
-        });
+        // Only add click event if not out of stock
+        if (color.stock > 0) {
+            colorOption.addEventListener('click', function () {
+                const colorId = this.dataset.colorId;
+                toggleColorSelection(colorId);
+            });
+        }
 
         container.appendChild(colorOption);
     });
@@ -299,23 +527,33 @@ function toggleColorSelection(colorId) {
     const colorOption = document.querySelector(`.color-option[data-color-id="${colorId}"]`);
     if (!colorOption) return;
 
+    const totalStock = parseInt(colorOption.dataset.stock) || 0;
+
     if (colorOption.classList.contains('selected')) {
         colorOption.classList.remove('selected');
         delete currentSelections[colorId];
         const sizeGroup = document.querySelector(`.color-size-group[data-color-id="${colorId}"]`);
         if (sizeGroup) sizeGroup.remove();
     } else {
+        // Check if there's any remaining stock
+        const remainingStock = getRemainingStockForColor(colorId);
+        if (remainingStock <= 0) {
+            showToast('No stock available for this color', 'warning');
+            return;
+        }
+
         colorOption.classList.add('selected');
         if (!currentSelections[colorId]) currentSelections[colorId] = {};
         document.getElementById('editSizeSelection').style.display = 'block';
         addSizeOptionsForEditColor(colorId);
     }
 
+    updateStockDisplayForColor(colorId);
     updateEditSelectionSummary();
     updateEditTotalPrice();
 }
 
-// Add size options for color in edit mode with discount pricing
+// Add size options for color in edit mode with discount pricing and stock info
 function addSizeOptionsForEditColor(colorId) {
     const colorData = availableColors.find(c => c.id == colorId);
     if (!colorData) return;
@@ -335,7 +573,6 @@ function addSizeOptionsForEditColor(colorId) {
         extraPriceHtml = `<span class="extra-price-tag">+₹${extraPrice}</span>`;
     }
 
-    // Price display for this color
     const priceDisplay = getPriceDisplay(
         finalPrice,
         originalItemPrice,
@@ -343,15 +580,18 @@ function addSizeOptionsForEditColor(colorId) {
         discountValue
     );
 
-    // Safely get sizes
     const sizes = Array.isArray(colorData.sizes) ? colorData.sizes :
         (typeof colorData.sizes === 'string' ? colorData.sizes.split(',').map(s => s.trim()) : []);
+
+    const totalStock = colorData.stock || 0;
+    const remainingStock = getRemainingStockForColor(colorId);
 
     const sizeGroup = document.createElement('div');
     sizeGroup.className = 'color-size-group';
     sizeGroup.dataset.colorId = colorId;
     sizeGroup.dataset.extraPrice = extraPrice;
     sizeGroup.dataset.unitPrice = finalPrice;
+    sizeGroup.dataset.totalStock = totalStock;
 
     sizeGroup.innerHTML = `
         <div class="color-size-header">
@@ -362,6 +602,9 @@ function addSizeOptionsForEditColor(colorId) {
                     ${priceDisplay}
                 </div>
                 ${extraPriceHtml}
+                <div class="stock-info">
+                    Total Stock: ${totalStock} | Available: <span id="available-stock-${colorId}" style="color: #4CAF50;">${remainingStock}</span>
+                </div>
             </div>
         </div>
         <div class="size-options">
@@ -412,65 +655,125 @@ function toggleEditSizeSelection(colorId, size, element) {
     const extraPrice = colorData?.extraPrice || 0;
     const basePrice = currentEditProduct.basePrice || 0;
     const unitPrice = basePrice + extraPrice;
+    const totalStock = colorData?.stock || 0;
 
     if (currentSelections[colorId] && currentSelections[colorId][size]) {
+        // Remove size selection
         delete currentSelections[colorId][size];
         element.classList.remove('selected');
         const quantityDiv = element.nextElementSibling;
         if (quantityDiv?.classList.contains('size-quantity')) {
             quantityDiv.remove();
         }
+
+        // If no sizes left for this color, remove color selection
+        if (Object.keys(currentSelections[colorId]).length === 0) {
+            const colorOption = document.querySelector(`.color-option[data-color-id="${colorId}"]`);
+            if (colorOption) colorOption.classList.remove('selected');
+            delete currentSelections[colorId];
+        }
     } else {
+        // Check if we can add this size based on available stock
+        const remainingStock = getRemainingStockForColor(colorId);
+        if (remainingStock <= 0) {
+            showToast('No stock available for this color', 'warning');
+            return;
+        }
+
         if (!currentSelections[colorId]) currentSelections[colorId] = {};
-        const existingQuantity = currentSelections[colorId][size]?.quantity || 1;
+
+        // Set initial quantity (minimum of remaining stock and 1)
+        const initialQuantity = Math.min(1, remainingStock);
 
         currentSelections[colorId][size] = {
-            quantity: existingQuantity,
+            quantity: initialQuantity,
             unitPrice: unitPrice
         };
 
         element.classList.add('selected');
-        addEditQuantityInput(colorId, size, element, existingQuantity);
+        addEditQuantityInput(colorId, size, element, initialQuantity);
     }
 
+    updateStockDisplayForColor(colorId);
     updateEditSelectionSummary();
     updateEditTotalPrice();
 }
 
-// Add quantity input for edit mode
+// Add quantity input for edit mode with stock validation
 function addEditQuantityInput(colorId, size, sizeElement, currentQuantity) {
     const existingQuantityDiv = sizeElement.nextElementSibling;
     if (existingQuantityDiv?.classList.contains('size-quantity')) {
         existingQuantityDiv.remove();
     }
 
+    const colorData = availableColors.find(c => c.id == colorId);
+    const totalStock = colorData?.stock || 0;
+    const remainingStock = getRemainingStockForColor(colorId);
+
+    // Calculate max quantity based on remaining stock + current selection
+    const currentSizeQuantity = currentSelections[colorId] && currentSelections[colorId][size]
+        ? currentSelections[colorId][size].quantity
+        : 0;
+
+    const otherSizesTotal = Object.keys(currentSelections[colorId] || {})
+        .filter(s => s !== size)
+        .reduce((sum, s) => sum + (currentSelections[colorId][s]?.quantity || 0), 0);
+
+    const maxQuantity = totalStock - otherSizesTotal;
+
     const quantityDiv = document.createElement('div');
     quantityDiv.className = 'size-quantity';
     quantityDiv.innerHTML = `
         <label>Quantity:</label>
         <input type="number" class="size-quantity-input" 
-               value="${currentQuantity}" min="1" max="10"
+               value="${currentQuantity}" min="1" max="${maxQuantity}"
                data-color-id="${colorId}" data-size="${size}">
+        <div class="stock-note" style="font-size: 11px; color: #666; margin-top: 2px;">
+            Max: ${maxQuantity} (${remainingStock} remaining)
+        </div>
     `;
 
     const quantityInput = quantityDiv.querySelector('.size-quantity-input');
+
     quantityInput.addEventListener('input', function () {
-        const quantity = parseInt(this.value) || 1;
-        if (quantity < 1) this.value = 1;
-        if (quantity > 10) this.value = 10;
+        let quantity = parseInt(this.value) || 1;
+        const max = parseInt(this.max) || 1;
+
+        // Validate against max
+        if (quantity > max) {
+            quantity = max;
+            this.value = max;
+            showToast(`Maximum ${max} allowed for this size`, 'warning');
+        }
+
+        if (quantity < 1) {
+            quantity = 1;
+            this.value = 1;
+        }
 
         if (currentSelections[colorId] && currentSelections[colorId][size]) {
             currentSelections[colorId][size].quantity = quantity;
         }
 
+        updateStockDisplayForColor(colorId);
         updateEditSelectionSummary();
         updateEditTotalPrice();
+    });
+
+    quantityInput.addEventListener('change', function () {
+        let quantity = parseInt(this.value) || 1;
+        if (quantity < 1) {
+            this.value = 1;
+            if (currentSelections[colorId] && currentSelections[colorId][size]) {
+                currentSelections[colorId][size].quantity = 1;
+            }
+        }
     });
 
     sizeElement.parentNode.insertBefore(quantityDiv, sizeElement.nextSibling);
 }
 
-// Update selection summary for edit mode with discount
+// Update selection summary for edit mode with discount and stock info
 function updateEditSelectionSummary() {
     const summaryContainer = document.getElementById('editSelectionSummary');
     if (!summaryContainer) return;
@@ -508,7 +811,7 @@ function updateEditSelectionSummary() {
                 `;
             }
 
-            return `${size} (${item.quantity} × ${priceDisplay}) = ₹${itemTotal.toLocaleString('en-IN')}`;
+            return `${size}: ${item.quantity} × ${priceDisplay} = ₹${itemTotal.toLocaleString('en-IN')}`;
         }).join('<br>');
 
         let extraPriceHtml = '';
@@ -516,17 +819,16 @@ function updateEditSelectionSummary() {
             extraPriceHtml = `<span class="extra-price-badge">+₹${extraPrice}</span>`;
         }
 
-        // Calculate savings for this color
-        let savingsHtml = '';
-        if (discountType != null && discountValue > 0) {
-            const totalQuantity = Object.values(colorSizes).reduce((sum, item) => sum + item.quantity, 0);
-            const totalOriginal = originalItemPrice * totalQuantity;
-            const totalDiscounted = finalPrice * totalQuantity;
-            const savings = totalOriginal - totalDiscounted;
+        // Calculate totals and savings
+        const totalQuantity = Object.values(colorSizes).reduce((sum, item) => sum + item.quantity, 0);
+        const totalOriginal = originalItemPrice * totalQuantity;
+        const totalDiscounted = finalPrice * totalQuantity;
+        const savings = totalOriginal - totalDiscounted;
+        const remainingStock = getRemainingStockForColor(colorId);
 
-            if (savings > 0) {
-                savingsHtml = `<div class="savings-info">Saved: ₹${savings.toLocaleString('en-IN')}</div>`;
-            }
+        let savingsHtml = '';
+        if (savings > 0) {
+            savingsHtml = `<div class="savings-info">Saved: ₹${savings.toLocaleString('en-IN')}</div>`;
         }
 
         summaryHTML += `
@@ -537,12 +839,18 @@ function updateEditSelectionSummary() {
                         <div>
                             <strong>${colorData.name || 'Unknown Color'}</strong>
                             ${extraPriceHtml}
+                            <span class="stock-badge" style="background-color: ${remainingStock > 0 ? '#4CAF50' : '#ff4444'}; color: white; padding: 2px 6px; border-radius: 10px; font-size: 11px;">
+                                ${remainingStock} left
+                            </span>
                             <button class="remove-color-btn" data-color-id="${colorId}">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
                         <div class="size-list">${sizeList}</div>
-                        ${savingsHtml}
+                        <div class="selection-total">
+                            Total: ₹${totalDiscounted.toLocaleString('en-IN')}
+                            ${savingsHtml}
+                        </div>
                     </div>
                 </div>
                 <div class="selection-actions">
@@ -564,7 +872,6 @@ function updateEditSelectionSummary() {
 
     summaryContainer.innerHTML = summaryHTML;
 
-    // Add event listeners to remove buttons
     document.querySelectorAll('.remove-color-btn').forEach(button => {
         button.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -592,6 +899,7 @@ function removeEditColor(colorId) {
     const sizeGroup = document.querySelector(`.color-size-group[data-color-id="${colorId}"]`);
     if (sizeGroup) sizeGroup.remove();
 
+    updateStockDisplayForColor(colorId);
     updateEditSelectionSummary();
     updateEditTotalPrice();
 }
@@ -618,6 +926,7 @@ function removeEditSize(colorId, size) {
         removeEditColor(colorId);
     }
 
+    updateStockDisplayForColor(colorId);
     updateEditSelectionSummary();
     updateEditTotalPrice();
 }
@@ -675,6 +984,31 @@ function updateEditTotalPrice() {
 async function updateCart() {
     if (!currentEditProduct) return;
 
+    // Final stock validation before updating
+    let hasSelections = false;
+    for (const colorId in currentSelections) {
+        const colorData = availableColors.find(c => c.id == colorId);
+        if (!colorData) continue;
+
+        const totalSelected = getTotalSelectedForColor(colorId);
+        if (totalSelected > colorData.stock) {
+            showToast(`Total quantity for ${colorData.name} exceeds available stock (${colorData.stock})`, 'error');
+            return;
+        }
+
+        if (totalSelected <= 0) {
+            showToast(`Please select at least one item for ${colorData.name}`, 'warning');
+            return;
+        }
+
+        hasSelections = true;
+    }
+
+    if (!hasSelections) {
+        showToast('Please select at least one color and size', 'warning');
+        return;
+    }
+
     const updateData = {
         productId: currentEditProduct.id,
         originalPrice: currentEditProduct.originalPrice,
@@ -702,6 +1036,7 @@ async function updateCart() {
                 colorName: colorData?.name || '',
                 colorCode: colorData?.code || '',
                 extraPrice: extraPrice,
+                stock: colorData?.stock || 0,
                 sizes: sizes
             });
         }
@@ -751,6 +1086,7 @@ function closeEditModal() {
     currentEditProduct = null;
     currentSelections = {};
     productDiscount = null;
+    colorStocks = {};
 }
 
 // ====== CART MANAGEMENT FUNCTIONS ======
@@ -770,22 +1106,23 @@ async function clearCart() {
     clearBtn.disabled = true;
 
     try {
-        const response = await fetch('/Cart/ClearCart', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        const result = await response.json();
-
+        $.ajax({
+            url: '/Cart/ClearCart',
+            type: 'POST',
+            success: function (response) {
+                if (response.success) {
+                    showToast('Your cart has been cleared successfully!', 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showToast('Failed to clear cart. Please try again.', 'error');
+                }
+            }
+        })
+        
         clearBtn.innerHTML = originalText;
         clearBtn.disabled = false;
 
-        if (result.success) {
-            showToast('Your cart has been cleared successfully!', 'success');
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showToast('Failed to clear cart. Please try again.', 'error');
-        }
+        
     } catch (error) {
         console.error('Clear cart error:', error);
         clearBtn.innerHTML = originalText;
@@ -837,6 +1174,7 @@ async function applyCoupon() {
 }
 
 // Proceed to checkout
+// Replace the existing proceedToCheckout function with this:
 async function proceedToCheckout() {
     const confirmed = await showConfirm(
         'Proceed to Checkout',
@@ -860,16 +1198,34 @@ async function proceedToCheckout() {
             return;
         }
 
-        // Redirect to checkout page
-        setTimeout(() => {
-            window.location.href = '/Checkout';
-        }, 1000);
+        // Create order first
+        const response = await fetch('/Order/Index', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            }
+        });
 
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Order created successfully! Redirecting to checkout...', 'success');
+
+            // Redirect to checkout page with order ID
+            setTimeout(() => {
+                window.location.href = `/Checkout?orderId=${result.orderId}`;
+            }, 1500);
+        } else {
+            showToast(result.message || 'Error creating order', 'error');
+            checkoutBtn.innerHTML = originalText;
+            checkoutBtn.disabled = false;
+        }
     } catch (error) {
         console.error('Checkout error:', error);
+        showToast('Error processing checkout. Please try again.', 'error');
         checkoutBtn.innerHTML = originalText;
         checkoutBtn.disabled = false;
-        showToast('Error processing checkout. Please try again.', 'error');
     }
 }
 

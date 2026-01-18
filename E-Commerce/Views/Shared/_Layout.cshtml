@@ -11,8 +11,9 @@
     <link rel="stylesheet" href="~/user/cart.css" asp-append-version="true">
     <link rel="stylesheet" href="~/user/modal.css" asp-append-version="true">
     <script src="~/user/notification/notification.js"></script>
+    <script src="~/user/notification/confirmation.js" defer></script>
 
-    <script src="~/notification.js" asp-append-version="true"></script>
+    @* <script src="~/notification.js" asp-append-version="true"></script> *@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -57,7 +58,7 @@
                             <a href="/Account/Profile" class="dropdown-item">
                                 <i class="fas fa-user"></i> My Profile
                             </a>
-                            <a href="/Account/Orders" class="dropdown-item">
+                            <a asp-controller="Order" asp-action="MyOrders" class="dropdown-item">
                                 <i class="fas fa-shopping-bag"></i> My Orders
                             </a>
                             <a href="/Account/Wishlist" class="dropdown-item">

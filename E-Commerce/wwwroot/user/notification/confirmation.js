@@ -9,46 +9,45 @@ function showConfirm(title, message) {
         document.body.style.overflow = 'hidden';
         confirmResolve = resolve;
     });
-}// Confirmation Modal Events
-document.querySelector('.close-confirm-modal')?.addEventListener('click', () => {
-    hideConfirm();
-    if (confirmResolve) confirmResolve(false);
-});
-
-document.querySelector('#customConfirmModal .modal-overlay')?.addEventListener('click', () => {
-    hideConfirm();
-    if (confirmResolve) confirmResolve(false);
-});
-
-document.getElementById('confirmCancelBtn')?.addEventListener('click', () => {
-    hideConfirm();
-    if (confirmResolve) confirmResolve(false);
-});
-
-document.getElementById('confirmOkBtn')?.addEventListener('click', () => {
-    hideConfirm();
-    if (confirmResolve) confirmResolve(true);
-});
-
-document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-        if (document.getElementById('customConfirmModal').style.display === 'block') {
-            hideConfirm();
-            if (confirmResolve) confirmResolve(false);
-        }
-
-        if (document.getElementById('customToast')?.classList.contains('show')) {
-            hideToast();
-        }
-
-        if (document.getElementById('editCartModal').style.display === 'block') {
-            closeEditModal();
-        }
-    }
-});
+}
 
 function hideConfirm() {
     document.getElementById('customConfirmModal').style.display = 'none';
     document.body.style.overflow = 'auto';
-    confirmResolve = null;
+    setTimeout(() => confirmResolve = null, 0);
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.getElementById('confirmOkBtn')?.addEventListener('click', () => {
+        confirmResolve?.(true);   // ✅ pehle resolve
+        hideConfirm();            // phir close
+    });
+
+    document.getElementById('confirmCancelBtn')?.addEventListener('click', () => {
+        confirmResolve?.(false);  // ✅ pehle resolve
+        hideConfirm();
+    });
+
+    document.querySelector('.close-confirm-modal')?.addEventListener('click', () => {
+        confirmResolve?.(false);
+        hideConfirm();
+    });
+
+    document.querySelector('#customConfirmModal .modal-overlay')?.addEventListener('click', () => {
+        confirmResolve?.(false);
+        hideConfirm();
+    });
+
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            if (document.getElementById('customConfirmModal').style.display === 'block') {
+                hideConfirm();
+                confirmResolve?.(false);
+            }
+        }
+    });
+
+});

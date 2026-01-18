@@ -425,6 +425,14 @@
       "PackagePath": "staticwebassets\\notification.js"
     },
     {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\about\\about.css",
+      "PackagePath": "staticwebassets\\user\\about\\about.css"
+    },
+    {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\about\\about.js",
+      "PackagePath": "staticwebassets\\user\\about\\about.js"
+    },
+    {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\cart.css",
       "PackagePath": "staticwebassets\\user\\cart.css"
     },
@@ -435,6 +443,14 @@
     {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\cartitems.js",
       "PackagePath": "staticwebassets\\user\\cartitems.js"
+    },
+    {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\checkout\\checkout.css",
+      "PackagePath": "staticwebassets\\user\\checkout\\checkout.css"
+    },
+    {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\checkout\\checkout.js",
+      "PackagePath": "staticwebassets\\user\\checkout\\checkout.js"
     },
     {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\collections.css",
@@ -483,6 +499,14 @@
     {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\notification\\notification.js",
       "PackagePath": "staticwebassets\\user\\notification\\notification.js"
+    },
+    {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\order\\order.js",
+      "PackagePath": "staticwebassets\\user\\order\\order.js"
+    },
+    {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\order\\orders.css",
+      "PackagePath": "staticwebassets\\user\\order\\orders.css"
     },
     {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\sales\\sales.css",

@@ -1,4 +1,5 @@
-﻿using E_Commerce.Models;
+﻿using E_Commerce.Migrations;
+using E_Commerce.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -116,6 +117,7 @@ namespace E_Commerce.Controllers
         public async Task<IActionResult> GetProductWithSelections(int productId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var cart = await _myDbContext.Carts
                 .Include(c => c.Items)
                     .ThenInclude(i => i.Product)
@@ -127,13 +129,12 @@ namespace E_Commerce.Controllers
             if (cart == null)
                 return Json(new { success = false, message = "Cart not found" });
 
-            // Get product
+            // Get product with discount and colors
             var product = await _myDbContext.Products
-    .Include(p => p.Discount) // ✅ ADD THIS
-    .Include(p => p.ProductColors)
-        .ThenInclude(pc => pc.Images)
-    .FirstOrDefaultAsync(p => p.Id == productId);
-
+                .Include(p => p.Discount)
+                .Include(p => p.ProductColors)
+                    .ThenInclude(pc => pc.Images)
+                .FirstOrDefaultAsync(p => p.Id == productId);
 
             if (product == null)
                 return Json(new { success = false, message = "Product not found" });
@@ -152,6 +153,25 @@ namespace E_Commerce.Controllers
                 })
                 .ToList();
 
+            // Calculate discounted price
+            decimal originalPrice = product.Price;
+            decimal discountedPrice = originalPrice;
+
+            if (product.Discount != null)
+            {
+                if (product.Discount.DiscountType == Discount._Type.Percentage)
+                {
+                    discountedPrice = originalPrice - (originalPrice * product.Discount.DiscountValue / 100);
+                }
+                else if (product.Discount.DiscountType == Discount._Type.Fixed)
+                {
+                    discountedPrice = originalPrice - product.Discount.DiscountValue;
+                }
+
+                // Ensure price doesn't go below 0
+                discountedPrice = Math.Max(discountedPrice, 0);
+            }
+
             // Prepare response
             var response = new
             {
@@ -160,14 +180,14 @@ namespace E_Commerce.Controllers
                 {
                     id = product.Id,
                     name = product.Name,
-                    price = product.Price,
-                    originalPrice = product.Price,
+                    price = discountedPrice, // ✅ Discounted price
+                    originalPrice = originalPrice, // ✅ Original price
                     discount = product.Discount == null ? null : new
                     {
                         id = product.Discount.Id,
-                        type = product.Discount.DiscountType,
+                        type = (int)product.Discount.DiscountType, // ✅ Convert enum to int
                         value = product.Discount.DiscountValue,
-                        discountedPrice = product.Discount.DiscountedPrice,
+                        discountedPrice = discountedPrice,
                         createdAt = product.Discount.CreatedAt
                     },
                     image = product.ProductColors
@@ -180,9 +200,10 @@ namespace E_Commerce.Controllers
                         name = pc.ColorName,
                         code = pc.ColorCode,
                         extraPrice = pc.ExtraPrice,
+                        stock = pc.Stock, // ✅ Stock per color
                         sizes = pc.Sizes?.Split(',', StringSplitOptions.RemoveEmptyEntries)
                             .Select(s => s.Trim())
-                            .ToArray() ?? new string[0]
+                            .ToArray() ?? Array.Empty<string>()
                     }).ToList(),
                     currentSelections = currentSelections
                 }
@@ -255,7 +276,21 @@ namespace E_Commerce.Controllers
             return product.Price + (color.ExtraPrice ?? 0);
         }
 
-        
+        public async Task<JsonResult> ClearCart()
+        {
+            if (string.IsNullOrEmpty(userId))
+                return Json(new { success = false, message = "User not logged in" });
+
+            var cartItems = await _myDbContext.CartItems
+                                .Where(x => x.Cart.UserId == userId)
+                                .ToListAsync();
+
+            _myDbContext.CartItems.RemoveRange(cartItems);
+            await _myDbContext.SaveChangesAsync();
+
+            return Json(new { success = true, deletedCount = cartItems.Count });
+        }
+
 
     }
 }

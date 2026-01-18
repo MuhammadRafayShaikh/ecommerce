@@ -1,0 +1,190 @@
+﻿@model List<E_Commerce.Models.Order>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "My Orders";
+}
+<link rel="stylesheet" href="~/user/order/orders.css"/>
+<!-- My Orders Page -->
+<div class="orders-container" style="margin-top: 80px;">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-clipboard-list"></i> My Orders</h1>
+        <p>Track and manage your purchase history</p>
+    </div>
+
+    @if (Model.Any())
+    {
+        <!-- Filter Tabs -->
+        <div class="orders-filter">
+            <button class="filter-btn active" data-filter="all">All Orders</button>
+            <button class="filter-btn" data-filter="pending">Pending</button>
+            <button class="filter-btn" data-filter="confirmed">Confirmed</button>
+            <button class="filter-btn" data-filter="shipped">Shipped</button>
+            <button class="filter-btn" data-filter="delivered">Delivered</button>
+            <button class="filter-btn" data-filter="cancelled">Cancelled</button>
+        </div>
+
+        <!-- Orders List -->
+        <div class="orders-list" id="ordersList">
+            @foreach (var order in Model)
+            {
+                <div class="order-card" data-status="@order.Status">
+                    <!-- Order Header -->
+                    <div class="order-header">
+                        <div class="order-info">
+                            <h3 class="order-number">Order #@order.OrderNumber</h3>
+                            <div class="order-date">
+                                <i class="far fa-calendar-alt"></i>
+                                @order.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")
+                            </div>
+                        </div>
+                        <div class="order-status">
+                            <span class="status-badge @order.Status">
+                                <i class="@order.Status"></i>
+                                @order.Status.ToString()
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Order Items Preview -->
+                    <div class="order-items-preview">
+                        @foreach (var item in order.Items.Take(2))
+                        {
+                            <div class="preview-item">
+                                <div class="preview-image"
+                                     style="background-image: url('/ProductImages/@item.Product?.ProductColors?.SelectMany(x => x.Images).Select(x => x.ImagePath).FirstOrDefault()')">
+                                </div>
+                                <div class="preview-details">
+                                    <h4>@item.Product?.Name</h4>
+                                    <div class="item-attributes">
+                                        @if (item.ProductColor != null)
+                                        {
+                                            <span class="color-dot-small"
+                                                  style="background-color: @item.ProductColor.ColorCode"></span>
+                                            <span>@item.ProductColor.ColorName</span>
+                                        }
+                                        <span class="size-badge">@item.Size</span>
+                                        <span class="quantity">Qty: @item.Quantity</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        @if (order.Items.Count > 2)
+                        {
+                            <div class="more-items">
+                                +@(order.Items.Count - 2) more items
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="order-summary">
+                        <div class="summary-row">
+                            <span>Items Total</span>
+                            <span>₹@order.SubTotal.ToString("N0")</span>
+                        </div>
+
+                        @if (order.DiscountTotal > 0)
+                        {
+                            <div class="summary-row discount">
+                                <span>Discount</span>
+                                <span>-₹@order.DiscountTotal.ToString("N0")</span>
+                            </div>
+                        }
+
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span>₹@order.Shipping.ToString("N0")</span>
+                        </div>
+
+                        <div class="summary-row total">
+                            <span>Grand Total</span>
+                            <span class="grand-total">₹@order.GrandTotal.ToString("N0")</span>
+                        </div>
+                    </div>
+
+                    <!-- Order Actions -->
+                    <div class="order-actions">
+                        <a href="/Orders/Details/@order.Id" class="btn-view-details">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+
+                        <a href="/Orders/Track/@order.Id" class="btn-track">
+                            <i class="fas fa-map-marker-alt"></i> Track Order
+                        </a>
+
+                        @if (order.Status == Order.OrderStatus.Pending || order.Status == Order.OrderStatus.Cancelled)
+                        {
+                            <button class="btn-retry-payment" data-order-id="@order.Id">
+                                <i class="fas fa-redo"></i> Retry Payment
+                            </button>
+                        }
+
+                        @if (order.Status == Order.OrderStatus.Pending)
+                        {
+                            <button class="btn-cancel-order" data-order-id="@order.Id">
+                                <i class="fas fa-times"></i> Cancel Order
+                            </button>
+                        }
+
+                        @if (order.Status == Order.OrderStatus.Delivered)
+                        {
+                            <button class="btn-review">
+                                <i class="fas fa-star"></i> Write Review
+                            </button>
+
+                            <button class="btn-reorder">
+                                <i class="fas fa-sync"></i> Reorder
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Empty Orders State -->
+        <div class="empty-orders">
+            <div class="empty-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <h3>No Orders Yet</h3>
+            <p>You haven't placed any orders. Start shopping to see your orders here!</p>
+            <a href="/Collections" class="btn-shop-now">
+                <i class="fas fa-shopping-cart"></i> Start Shopping
+            </a>
+        </div>
+    }
+</div>
+
+<!-- Order Details Modal -->
+<div id="orderDetailsModal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h2>Order Details</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body" id="orderDetailsContent">
+            <!-- Will be loaded via AJAX -->
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+@await Html.PartialAsync("_Confirmation")
+
+<!-- Toast Notification -->
+@await Html.PartialAsync("_Toast")
+
+@* @section Styles {
+    <link rel="stylesheet" href="~/css/order/orders.css" asp-append-version="true">
+} *@
+
+@* @section Scripts {
+    <script src="~/user/order/orders.js"></script>
+} *@
+
+<script src="~/user/order/order.js"></script>

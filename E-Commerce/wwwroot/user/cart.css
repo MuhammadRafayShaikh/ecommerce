@@ -1731,3 +1731,75 @@
     color: #4CAF50;
     font-weight: 500;
 }
+
+
+/* Add to your existing CSS file */
+.out-of-stock {
+    opacity: 0.5;
+    pointer-events: none;
+    position: relative;
+}
+
+    .out-of-stock::after {
+        content: "Out of Stock";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 68, 68, 0.9);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+.color-stock-info {
+    font-size: 12px;
+    margin-top: 4px;
+    color: #666;
+}
+
+.stock-info {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.stock-note {
+    font-size: 11px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.stock-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    color: white;
+    margin-left: 8px;
+    font-weight: normal;
+}
+
+.extra-price-tag {
+    background-color: #ff9800;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+.extra-price-badge {
+    background-color: #ff9800;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-left: 8px;
+}
+
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}

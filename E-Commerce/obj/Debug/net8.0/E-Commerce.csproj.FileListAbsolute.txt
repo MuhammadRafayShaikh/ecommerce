@@ -137,3 +137,4 @@ C:\Users\Rohaan\source\repos\E-Commerce\E-Commerce\obj\Debug\net8.0\refint\E-Com
 C:\Users\Rohaan\source\repos\E-Commerce\E-Commerce\obj\Debug\net8.0\E-Commerce.pdb
 C:\Users\Rohaan\source\repos\E-Commerce\E-Commerce\obj\Debug\net8.0\E-Commerce.genruntimeconfig.cache
 C:\Users\Rohaan\source\repos\E-Commerce\E-Commerce\obj\Debug\net8.0\ref\E-Commerce.dll
+C:\Users\Rohaan\source\repos\E-Commerce\E-Commerce\obj\Debug\net8.0\E-Commerce.sourcelink.json
