@@ -31,14 +31,11 @@ namespace E_Commerce.Controllers
 
         }
 
-        // GET: /Account/Register
-        //[HttpGet]
         public IActionResult Register()
         {
             return View();
         }
 
-        // POST: /Account/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
@@ -56,7 +53,6 @@ namespace E_Commerce.Controllers
                 return View(model);
             }
 
-            // Create new user
             var user = new ApplicationUser
             {
                 FirstName = model.FirstName,
@@ -72,25 +68,22 @@ namespace E_Commerce.Controllers
 
             if (result.Succeeded)
             {
-                // Ensure role exists
                 if (!await _roleManager.RoleExistsAsync("User"))
                 {
                     await _roleManager.CreateAsync(new IdentityRole("User"));
                 }
 
-                // Assign User role
                 await _userManager.AddToRoleAsync(user, "User");
 
-                // Auto login
                 await _signInManager.SignInAsync(user, isPersistent: false);
+
                 _emailQueue.QueueEmail(
                     async token => await _emailService.SendEmailAsync(user.Email, user.FirstName)
                     );
-                // Redirect to homepage or dashboard
+
                 return RedirectToAction("Index", "Home");
             }
 
-            // Display errors
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError("", error.Description);

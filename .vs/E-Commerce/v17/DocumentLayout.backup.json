@@ -502,7 +502,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 9,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Document",
@@ -570,39 +570,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Program.cs",
-              "RelativeDocumentMoniker": "E-Commerce\\Program.cs",
-              "ToolTip": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Program.cs",
-              "RelativeToolTip": "E-Commerce\\Program.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAAABAAAAArAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-09T16:24:41.637Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "CartCountViewComponent.cs",
-              "DocumentMoniker": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Controllers\\ViewComponents\\CartCountViewComponent.cs",
-              "RelativeDocumentMoniker": "E-Commerce\\Controllers\\ViewComponents\\CartCountViewComponent.cs",
-              "ToolTip": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Controllers\\ViewComponents\\CartCountViewComponent.cs",
-              "RelativeToolTip": "E-Commerce\\Controllers\\ViewComponents\\CartCountViewComponent.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAUwBEAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-10T11:34:19.474Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "EmailService.cs",
               "DocumentMoniker": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Services\\EmailService.cs",
               "RelativeDocumentMoniker": "E-Commerce\\Services\\EmailService.cs",
               "ToolTip": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Services\\EmailService.cs",
               "RelativeToolTip": "E-Commerce\\Services\\EmailService.cs",
-              "ViewState": "AgIAAAcAAAAAAAAAAAAAABEAAAAIAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-21T18:23:40.599Z",
               "EditorCaption": ""
@@ -617,8 +591,7 @@
               "RelativeToolTip": "E-Commerce\\Interfaces\\IBackgroundEmailQueue.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-21T18:33:23.432Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T18:33:23.432Z"
             },
             {
               "$type": "Document",
@@ -626,12 +599,36 @@
               "Title": "AccountController.cs",
               "DocumentMoniker": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Controllers\\AccountController.cs",
               "RelativeDocumentMoniker": "E-Commerce\\Controllers\\AccountController.cs",
-              "ToolTip": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Controllers\\AccountController.cs*",
-              "RelativeToolTip": "E-Commerce\\Controllers\\AccountController.cs*",
-              "ViewState": "AgIAAFQAAAAAAAAAAAAAAG4AAAAuAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "E-Commerce\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAAEkAAAAAAAAAAAAAAFYAAABFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-21T18:47:12.856Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CartCountViewComponent.cs",
+              "DocumentMoniker": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Controllers\\ViewComponents\\CartCountViewComponent.cs",
+              "RelativeDocumentMoniker": "E-Commerce\\Controllers\\ViewComponents\\CartCountViewComponent.cs",
+              "ToolTip": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Controllers\\ViewComponents\\CartCountViewComponent.cs",
+              "RelativeToolTip": "E-Commerce\\Controllers\\ViewComponents\\CartCountViewComponent.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAUwBEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-10T11:34:19.474Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Program.cs",
+              "RelativeDocumentMoniker": "E-Commerce\\Program.cs",
+              "ToolTip": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\Program.cs",
+              "RelativeToolTip": "E-Commerce\\Program.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAAABAAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-09T16:24:41.637Z"
             },
             {
               "$type": "Document",
@@ -643,8 +640,7 @@
               "RelativeToolTip": "E-Commerce\\Controllers\\HomeController.cs",
               "ViewState": "AgIAAA4AAAAAAAAAAAAAAB8AAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-05T16:52:23.286Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-05T16:52:23.286Z"
             },
             {
               "$type": "Document",
@@ -656,8 +652,7 @@
               "RelativeToolTip": "E-Commerce\\Services\\EmailBackgroundService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-21T18:36:39.087Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T18:36:39.087Z"
             },
             {
               "$type": "Document",
@@ -669,8 +664,7 @@
               "RelativeToolTip": "E-Commerce\\BackgroundJobs\\BackgroundEmailQueue.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-21T18:34:41.569Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T18:34:41.569Z"
             },
             {
               "$type": "Document",
@@ -682,8 +676,7 @@
               "RelativeToolTip": "E-Commerce\\Views\\Shared\\Components\\CartCount\\Default.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-10T11:35:46.359Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-10T11:35:46.359Z"
             },
             {
               "$type": "Document",
@@ -695,8 +688,7 @@
               "RelativeToolTip": "E-Commerce\\Views\\Settings\\Index.cshtml",
               "ViewState": "AgIAAOgCAAAAAAAAAAAAAPkCAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-20T18:51:15.823Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-20T18:51:15.823Z"
             },
             {
               "$type": "Document",
@@ -708,8 +700,7 @@
               "RelativeToolTip": "E-Commerce\\Services\\SettingsService.cs",
               "ViewState": "AgIAAAEAAAAAAAAAAADwvw8AAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-21T16:45:37.518Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T16:45:37.518Z"
             },
             {
               "$type": "Document",
@@ -721,8 +712,7 @@
               "RelativeToolTip": "E-Commerce\\Views\\Shared\\_Layout.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-21T16:56:19.446Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T16:56:19.446Z"
             },
             {
               "$type": "Document",
@@ -734,8 +724,7 @@
               "RelativeToolTip": "E-Commerce\\Views\\Home\\Index.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAABBAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-09T16:13:01.203Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-09T16:13:01.203Z"
             },
             {
               "$type": "Document",
@@ -747,8 +736,7 @@
               "RelativeToolTip": "E-Commerce\\Services\\AddImage.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-21T19:21:30.045Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T19:21:30.045Z"
             },
             {
               "$type": "Document",
@@ -760,8 +748,7 @@
               "RelativeToolTip": "E-Commerce\\Views\\Account\\Login.cshtml",
               "ViewState": "AgIAAEIAAAAAAAAAAAAAAE4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-08T17:25:54.699Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-08T17:25:54.699Z"
             },
             {
               "$type": "Document",
@@ -773,8 +760,7 @@
               "RelativeToolTip": "E-Commerce\\Views\\Account\\Register.cshtml",
               "ViewState": "AgIAAEgAAAAAAAAAAAAAAGcAAAA4AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-09T16:10:34.717Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-09T16:10:34.717Z"
             },
             {
               "$type": "Document",
@@ -786,8 +772,7 @@
               "RelativeToolTip": "E-Commerce\\Views\\Order\\MyOrders.cshtml",
               "ViewState": "AgIAAGoAAAAAAAAAAAAAAH0AAAA7AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-21T17:46:32.823Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T17:46:32.823Z"
             },
             {
               "$type": "Document",
@@ -799,8 +784,7 @@
               "RelativeToolTip": "E-Commerce\\Views\\_ViewImports.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-21T16:54:44.114Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T16:54:44.114Z"
             },
             {
               "$type": "Document",
@@ -812,8 +796,7 @@
               "RelativeToolTip": "E-Commerce\\Controllers\\SettingsController.cs",
               "ViewState": "AgIAALUAAAAAAAAAAAAqwMwAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-20T18:49:49.6Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-20T18:49:49.6Z"
             },
             {
               "$type": "Document",
@@ -825,8 +808,7 @@
               "RelativeToolTip": "E-Commerce\\Views\\Cart\\Index.cshtml",
               "ViewState": "AgIAAG0BAAAAAAAAAAAAAH4BAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-08T18:09:40.954Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-08T18:09:40.954Z"
             },
             {
               "$type": "Document",
@@ -838,8 +820,7 @@
               "RelativeToolTip": "E-Commerce\\wwwroot\\user\\order\\order.js",
               "ViewState": "AgIAAMcAAAAAAAAAAAAmwOQAAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-18T20:17:58.247Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-18T20:17:58.247Z"
             },
             {
               "$type": "Document",
@@ -851,8 +832,7 @@
               "RelativeToolTip": "E-Commerce\\Controllers\\OrderController.cs",
               "ViewState": "AgIAAFoBAAAAAAAAAAAAAG0BAABZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-19T19:28:38.957Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-19T19:28:38.957Z"
             },
             {
               "$type": "Document",
@@ -864,8 +844,7 @@
               "RelativeToolTip": "E-Commerce\\wwwroot\\user\\cart.js",
               "ViewState": "AgIAAKUAAAAAAAAAAAAcwLQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-08T18:08:28.125Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-08T18:08:28.125Z"
             },
             {
               "$type": "Document",
@@ -889,8 +868,7 @@
               "RelativeToolTip": "E-Commerce\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-01-09T16:24:38.189Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-09T16:24:38.189Z"
             },
             {
               "$type": "Document",
@@ -1178,8 +1156,7 @@
               "RelativeToolTip": "E-Commerce\\wwwroot\\admin\\order\\order.js",
               "ViewState": "AgIAAD0AAAAAAAAAAAA9wE4AAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-01-19T18:15:56.368Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-19T18:15:56.368Z"
             },
             {
               "$type": "Document",
