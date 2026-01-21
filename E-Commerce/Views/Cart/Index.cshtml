@@ -1,6 +1,7 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "My Shopping Cart";
+    Settings setting = await SettingsService.GetSettingsAsync();
 }
 @model List<E_Commerce.Models.CartItem>
 
@@ -219,7 +220,7 @@
                     });
 
                     var totalSavingsAmount = originalSubtotal - subtotal;
-                    var delivery = 99M;
+                    var delivery = setting.ShippingCost;
                     var tax = subtotal * 0.12M;
                     var discount = 0M; // Additional discount from coupons
                     var total = subtotal + delivery + tax - discount;

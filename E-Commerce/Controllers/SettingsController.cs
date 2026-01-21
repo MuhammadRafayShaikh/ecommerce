@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using E_Commerce.Models;
 using System.Threading.Tasks;
 using System;
+using E_Commerce.Services;
 
 namespace E_Commerce.Controllers
 {
@@ -12,10 +13,12 @@ namespace E_Commerce.Controllers
     public class SettingsController : Controller
     {
         private readonly MyDbContext _context;
+        private readonly SettingsService _settingsService;
 
-        public SettingsController(MyDbContext context)
+        public SettingsController(MyDbContext context, SettingsService settingsService)
         {
             _context = context;
+            _settingsService = settingsService;
         }
 
         // GET: Settings/Index
@@ -30,6 +33,7 @@ namespace E_Commerce.Controllers
                 settings.SmtpPassword = "siuymtzsjdocebzk";
                 _context.Settings.Add(settings);
                 await _context.SaveChangesAsync();
+                _settingsService.ClearCache();
             }
 
             return View(settings);
@@ -69,6 +73,7 @@ namespace E_Commerce.Controllers
                     }
 
                     await _context.SaveChangesAsync();
+                    _settingsService.ClearCache();
 
                     TempData["SuccessMessage"] = "Settings updated successfully!";
                     return RedirectToAction(nameof(Index));
@@ -158,6 +163,7 @@ namespace E_Commerce.Controllers
 
                         existingSettings.UpdatedAt = DateTime.UtcNow;
                         await _context.SaveChangesAsync();
+                        _settingsService.ClearCache();
 
                         return Json(new { success = true, message = $"{section.Replace("-", " ")} settings updated successfully!" });
                     }
@@ -193,6 +199,7 @@ namespace E_Commerce.Controllers
 
                     _context.Entry(existingSettings).CurrentValues.SetValues(defaultSettings);
                     await _context.SaveChangesAsync();
+                    _settingsService.ClearCache();
 
                     TempData["SuccessMessage"] = "Settings reset to default values!";
                 }

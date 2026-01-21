@@ -19,22 +19,9 @@ namespace E_Commerce.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            ViewData["currentAction"] = "index";
             List<Category> categories = await _myDbContext.Categories.Where(x => x.IsActive).Include(x => x.Products).Take(4).ToListAsync();
             Product newProduct = await NewProduct();
-            // Different factors ko combine karke ek score banayein
             AttractiveDiscountDto attractiveDiscounts = await AttractiveDiscount();
-            //AttractiveDiscountDto attractiveDiscountDto = new AttractiveDiscountDto 
-            //{
-            //    ProductId = attractiveDiscounts.ProductId,
-            //    ProductName = attractiveDiscounts.ProductName,
-            //    OriginalPrice = attractiveDiscounts.OriginalPrice,
-            //    DiscountedPrice = attractiveDiscounts.DiscountedPrice,
-            //    DiscountText = attractiveDiscounts.DiscountText,
-            //    Savings = attractiveDiscounts.Savings
-            //};
-            //return Json(attractiveDiscounts);
-            //Product saleProduct = await _myDbContext.Products.Include(x => x.Discount)
             HomeViewModel homeViewModel = new HomeViewModel
             {
                 Categories = categories,

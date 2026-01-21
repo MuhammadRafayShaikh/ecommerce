@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    Settings settings = await SettingsService.GetSettingsAsync();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -21,7 +25,7 @@
     <header id="header">
         <div class="header-container">
             <a href="/" class="logo">
-                <i class="fas fa-vest"></i>Elegant<span>Stitch</span>
+                <img src="@settings.StoreLogoUrl" height="50" width="50" class="fas fa-vest" />@settings.StoreName.Split(" ")[0]<span>@settings.StoreName.Split(" ")[1]</span>
             </a>
 
             <div class="menu-toggle" id="menuToggle">
@@ -91,13 +95,13 @@
     <footer>
         <div class="footer-container">
             <div class="footer-col">
-                <h3>Elegant Stitch</h3>
-                <p>We bring you the finest collection of gents suits, combining traditional craftsmanship with contemporary designs for the modern woman.</p>
+                <h3>@settings.StoreName</h3>
+                <p>@settings.StoreDescription</p>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-pinterest-p"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="@settings.FacebookUrl"><i class="fab fa-facebook-f"></i></a>
+                    <a href="@settings.InstagramUrl"><i class="fab fa-instagram"></i></a>
+                    <a href="@settings.YouTubeUrl"><i class="fa fa-youtube"></i></a>
+                    <a href="@settings.TwitterUrl"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
 
@@ -107,7 +111,7 @@
                 <a asp-controller="Home" asp-action="Collections">Collections</a><br>
                 <a asp-controller="Home" asp-action="Featured">Featured</a><br>
                 <a href="#">New Arrivals</a><br>
-                <a href="#">Sale</a>
+                <a asp-controller="Home" asp-action="Sales">Sale</a>
             </div>
 
             <div class="footer-col">
@@ -121,9 +125,9 @@
 
             <div class="footer-col">
                 <h3>Contact Info</h3>
-                <p><i class="fas fa-map-marker-alt"></i> 123 Fashion Street, Mumbai, India</p>
-                <p><i class="fas fa-phone"></i> +91 98765 43210</p>
-                <p><i class="fas fa-envelope"></i> info@elegantstitch.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> @settings.StoreAddress</p>
+                <p><i class="fas fa-phone"></i> @settings.ContactPhone</p>
+                <p><i class="fas fa-envelope"></i> @settings.ContactEmail</p>
             </div>
         </div>
 

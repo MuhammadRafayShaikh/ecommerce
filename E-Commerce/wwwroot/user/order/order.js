@@ -201,26 +201,35 @@ async function cancelOrder(orderId) {
     showLoading('Cancelling order...');
 
     try {
-        const response = await fetch('/Orders/CancelOrder', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-            },
-            body: JSON.stringify({ orderId: parseInt(orderId) })
-        });
+        $.ajax({
+            url: "/Order/CancelOrder",
+            type: "POST",
+            data: { orderId: orderId },
+            success: function (result) {
+                hideLoading();
+                if (result.success) {
+                    showToast('Order cancelled successfully!', 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showToast(result.message, 'error');
+                }
+            }
+        })
+        //const response = await fetch('/Order/CancelOrder', {
+        //    method: 'POST',
+        //    headers: {
+        //        'Content-Type': 'application/json',
+        //        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        //    },
+        //    body: JSON.stringify({ orderId: parseInt(orderId) })
+        //});
 
-        const result = await response.json();
-        hideLoading();
+        //const result = await response.json();
+        
 
-        if (result.success) {
-            showToast('Order cancelled successfully!', 'success');
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-        } else {
-            showToast(result.message, 'error');
-        }
+        
     } catch (error) {
         console.error('Cancel order error:', error);
         hideLoading();

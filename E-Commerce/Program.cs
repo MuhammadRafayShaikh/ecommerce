@@ -3,6 +3,8 @@ using E_Commerce.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Google;
+using E_Commerce.BackgroundJobs;
+using E_Commerce.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,12 +14,20 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<AddImage>();
+builder.Services.AddScoped<EmailService>();
+
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<SettingsService>();
+
+builder.Services.AddSingleton<IBackgroundEmailQueue, BackgroundEmailQueue>();
+builder.Services.AddHostedService<EmailBackgroundService>();
+
 //builder.Services.AddControllersWithViews()
 //    .AddJsonOptions(options =>
 //    {
 //        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
 //    });
-builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
+builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")).EnableSensitiveDataLogging());
 
 builder.Services.AddDbContext<MyDbContext>(options =>
     options.UseSqlServer(

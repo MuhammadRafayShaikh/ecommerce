@@ -170,26 +170,26 @@ function updateStockDisplayForColor(colorId) {
 
 // ====== TOAST AND CONFIRMATION FUNCTIONS ======
 
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
+//function showToast(message, type = 'info') {
+//    const toast = document.getElementById('toast');
+//    const toastMessage = document.getElementById('toastMessage');
 
-    if (!toast || !toastMessage) return;
+//    if (!toast || !toastMessage) return;
 
-    toastMessage.textContent = message;
-    toast.className = `toast show ${type}`;
+//    toastMessage.textContent = message;
+//    toast.className = `toast show ${type}`;
 
-    setTimeout(() => {
-        toast.className = toast.className.replace('show', '');
-    }, 3000);
-}
+//    setTimeout(() => {
+//        toast.className = toast.className.replace('show', '');
+//    }, 3000);
+//}
 
-function hideToast() {
-    const toast = document.getElementById('toast');
-    if (toast) {
-        toast.className = toast.className.replace('show', '');
-    }
-}
+//function hideToast() {
+//    const toast = document.getElementById('toast');
+//    if (toast) {
+//        toast.className = toast.className.replace('show', '');
+//    }
+//}
 
 //async function showConfirm(title, message) {
 //    return new Promise((resolve) => {

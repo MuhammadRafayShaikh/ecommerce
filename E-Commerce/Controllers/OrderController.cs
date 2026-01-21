@@ -1,4 +1,5 @@
 ﻿using E_Commerce.Models;
+using E_Commerce.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -8,9 +9,11 @@ namespace E_Commerce.Controllers
     public class OrderController : Controller
     {
         private readonly MyDbContext _myDbContext;
-        public OrderController(MyDbContext myDbContext)
+        private readonly SettingsService _settingsService;
+        public OrderController(MyDbContext myDbContext, SettingsService settingsService)
         {
             _myDbContext = myDbContext;
+            _settingsService = settingsService;
         }
         [HttpPost]
         public async Task<IActionResult> Index()
@@ -32,7 +35,13 @@ namespace E_Commerce.Controllers
 
                 if (cart == null || !cart.Items.Any())
                     return Json(new { success = false, message = "Cart is empty" });
+                decimal totalPrice = await _myDbContext.CartItems.Where(x => x.Cart.UserId == userId).SumAsync(x => x.UnitPrice * x.Quantity);
+                Settings settings = await _settingsService.GetSettingsAsync();
 
+                if (totalPrice < settings.MinimumOrderAmount)
+                {
+                    return Json(new { success = false, message = $"Minimum order charges is {settings.MinimumOrderAmount}" });
+                }
                 var pendingOrder = await _myDbContext.Orders
     .Include(o => o.Items)
     .FirstOrDefaultAsync(o =>
@@ -111,7 +120,7 @@ namespace E_Commerce.Controllers
                 // Calculate totals
                 decimal subtotal = 0;
                 decimal discountTotal = 0;
-                decimal shipping = 99; // Fixed shipping
+                decimal shipping = settings.ShippingCost; // Fixed shipping
 
                 foreach (var item in cart.Items)
                 {

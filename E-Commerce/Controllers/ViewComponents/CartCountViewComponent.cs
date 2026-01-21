@@ -22,15 +22,20 @@ public class CartCountViewComponent : ViewComponent
 
         if (User.Identity.IsAuthenticated)
         {
-            var user = await _userManager.GetUserAsync(UserClaimsPrincipal);
+            var user = await _userManager.GetUserAsync(HttpContext.User);
 
-            count = _context.CartItems
-                .Where(x => x.Cart.UserId == user.Id)
-                .Select(x => x.ProductId)
-                .Distinct()
-                .Count();
+            if (user != null)
+            {
+                count = await _context.CartItems
+                    .Include(x => x.Cart)
+                    .Where(x => x.Cart.UserId == user.Id)
+                    .Select(x => x.ProductId)
+                    .Distinct()
+                    .CountAsync();
+            }
         }
 
         return View(count);
     }
+
 }

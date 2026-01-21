@@ -747,19 +747,6 @@
 
                         <div class="form-grid">
                             <div class="form-group">
-                                <label class="form-label" for="Currency">
-                                    <i class="fas fa-money-bill-wave"></i> Currency
-                                </label>
-                                <select class="form-control" id="Currency" name="Currency">
-                                    <option value="PKR" selected="@(Model.Currency == "PKR")">Pakistani Rupee (PKR)</option>
-                                    <option value="USD" selected="@(Model.Currency == "USD")">US Dollar (USD)</option>
-                                    <option value="EUR" selected="@(Model.Currency == "EUR")">Euro (EUR)</option>
-                                    <option value="GBP" selected="@(Model.Currency == "GBP")">British Pound (GBP)</option>
-                                    <option value="AED" selected="@(Model.Currency == "AED")">UAE Dirham (AED)</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
                                 <label class="form-label" for="CurrencySymbol">
                                     <i class="fas fa-symbol"></i> Currency Symbol
                                 </label>
@@ -780,13 +767,6 @@
                                 <input type="number" class="form-control" id="ShippingCost" name="ShippingCost" value="@Model.ShippingCost" min="0">
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label" for="FreeShippingMinimum">
-                                    <i class="fas fa-truck-loading"></i> Free Shipping Minimum
-                                </label>
-                                <input type="number" class="form-control" id="FreeShippingMinimum" name="FreeShippingMinimum" value="@Model.FreeShippingMinimum" min="0">
-                                <small class="form-text">Minimum order amount for free shipping</small>
-                            </div>
 
                             <div class="form-group">
                                 <label class="form-label" for="MinimumOrderAmount">

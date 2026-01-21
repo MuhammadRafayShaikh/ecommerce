@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using E_Commerce.Models;
 using System.Security.Claims;
+using E_Commerce.Services;
+using E_Commerce.Interfaces;
 namespace E_Commerce.Controllers
 {
     public class AccountController : Controller
@@ -10,14 +12,23 @@ namespace E_Commerce.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
+        private readonly IBackgroundEmailQueue _emailQueue;
+        private readonly EmailService _emailService;
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            EmailService emailService,
+            IBackgroundEmailQueue emailQueue
+            )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+
+            _emailService = emailService;
+            _emailQueue = emailQueue;
+
         }
 
         // GET: /Account/Register
@@ -72,7 +83,9 @@ namespace E_Commerce.Controllers
 
                 // Auto login
                 await _signInManager.SignInAsync(user, isPersistent: false);
-
+                _emailQueue.QueueEmail(
+                    async token => await _emailService.SendEmailAsync(user.Email, user.FirstName)
+                    );
                 // Redirect to homepage or dashboard
                 return RedirectToAction("Index", "Home");
             }
@@ -95,6 +108,7 @@ namespace E_Commerce.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            //await _emailService.SendEmailAsync("aptechrafay2@gmail.com", "xyz");
             //return Json(ModelState);
             //return Json(returnUrl);
             if (!ModelState.IsValid)
