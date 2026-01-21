@@ -1,0 +1,1478 @@
+﻿@model Settings
+@{
+    ViewData["Title"] = "Settings";
+    Layout = "_Layout1";
+}
+
+<style>
+    /* Settings Page Styles */
+    .settings-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .settings-header {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .settings-header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .settings-header h1 i {
+        font-size: 36px;
+    }
+
+    .settings-header p {
+        opacity: 0.9;
+        font-size: 16px;
+        max-width: 600px;
+    }
+
+    .settings-grid {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 30px;
+    }
+
+    .settings-sidebar {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: var(--card-shadow);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+
+    .settings-nav {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .settings-nav-item {
+        margin-bottom: 5px;
+    }
+
+    .settings-nav-link {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        border-radius: 12px;
+        color: var(--dark);
+        text-decoration: none;
+        transition: var(--transition);
+        font-weight: 500;
+        border: 1px solid transparent;
+    }
+
+    .settings-nav-link:hover {
+        background: rgba(156, 39, 176, 0.05);
+        border-color: rgba(156, 39, 176, 0.1);
+        transform: translateX(5px);
+    }
+
+    .settings-nav-link.active {
+        background: rgba(156, 39, 176, 0.1);
+        color: var(--primary);
+        border-color: rgba(156, 39, 176, 0.2);
+        font-weight: 600;
+    }
+
+    .settings-nav-icon {
+        margin-right: 12px;
+        font-size: 18px;
+        width: 24px;
+        text-align: center;
+    }
+
+    .settings-content {
+        background: white;
+        border-radius: 20px;
+        padding: 0;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+
+    .settings-section {
+        padding: 30px;
+        display: none;
+        animation: fadeIn 0.4s ease;
+    }
+
+    .settings-section.active {
+        display: block;
+    }
+
+    .settings-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f5f5f5;
+    }
+
+    .settings-section-header h2 {
+        font-size: 24px;
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .settings-section-header h2 i {
+        color: var(--primary);
+        background: rgba(156, 39, 176, 0.1);
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .settings-section-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .settings-form {
+        max-width: 800px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: var(--dark);
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: var(--primary);
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #eee;
+        border-radius: 12px;
+        font-size: 15px;
+        transition: var(--transition);
+        background: #f9f9f9;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(156, 39, 176, 0.1);
+    }
+
+    .form-control[readonly] {
+        background: #f0f0f0;
+        cursor: not-allowed;
+    }
+
+    .form-text {
+        font-size: 13px;
+        color: #777;
+        margin-top: 8px;
+        display: block;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+        background-color: var(--primary);
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(30px);
+    }
+
+    .toggle-label {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-weight: 500;
+        color: var(--dark);
+        cursor: pointer;
+    }
+
+    .settings-actions {
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 2px solid #f5f5f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .btn {
+        padding: 14px 28px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--primary-dark), #6a1b9a);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(156, 39, 176, 0.3);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, var(--secondary), #e91e63);
+        color: white;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #e91e63, #c2185b);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 64, 129, 0.3);
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: var(--dark);
+        border: 2px solid #ddd;
+    }
+
+    .btn-outline:hover {
+        background: #f5f5f5;
+        border-color: #ccc;
+        transform: translateY(-3px);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, var(--danger), #c62828);
+        color: white;
+        border: none;
+    }
+
+    .btn-danger:hover {
+        background: linear-gradient(135deg, #c62828, #b71c1c);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(244, 67, 54, 0.3);
+    }
+
+    .settings-preview {
+        background: #f9f0fa;
+        border-radius: 15px;
+        padding: 25px;
+        margin-top: 20px;
+        border: 1px solid rgba(156, 39, 176, 0.1);
+    }
+
+    .preview-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(156, 39, 176, 0.1);
+    }
+
+    .preview-item:last-child {
+        border-bottom: none;
+    }
+
+    .preview-label {
+        font-weight: 500;
+        color: var(--dark);
+    }
+
+    .preview-value {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .preview-value.active {
+        color: var(--success);
+    }
+
+    .preview-value.inactive {
+        color: var(--danger);
+    }
+
+    .logo-preview {
+        width: 150px;
+        height: 150px;
+        background: white;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed #ddd;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .logo-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .social-links {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .social-link {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .social-link.facebook { background: #1877f2; }
+    .social-link.instagram { background: #e4405f; }
+    .social-link.twitter { background: #1da1f2; }
+    .social-link.youtube { background: #ff0000; }
+
+    .social-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .settings-alert {
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .settings-alert.success {
+        background: rgba(76, 175, 80, 0.1);
+        border: 1px solid rgba(76, 175, 80, 0.2);
+        color: #2e7d32;
+    }
+
+    .settings-alert.warning {
+        background: rgba(255, 152, 0, 0.1);
+        border: 1px solid rgba(255, 152, 0, 0.2);
+        color: #ef6c00;
+    }
+
+    .settings-alert.danger {
+        background: rgba(244, 67, 54, 0.1);
+        border: 1px solid rgba(244, 67, 54, 0.2);
+        color: #c62828;
+    }
+
+    .settings-alert.info {
+        background: rgba(33, 150, 243, 0.1);
+        border: 1px solid rgba(33, 150, 243, 0.2);
+        color: #1565c0;
+    }
+
+    .settings-alert i {
+        font-size: 20px;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        backdrop-filter: blur(3px);
+    }
+
+    .loading-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 1200px) {
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .settings-sidebar {
+            position: static;
+            margin-bottom: 20px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .settings-section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .settings-actions {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .settings-header {
+            padding: 20px;
+        }
+
+        .settings-section {
+            padding: 20px;
+        }
+
+        .social-links {
+            justify-content: center;
+        }
+    }
+</style>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <h1><i class="fas fa-cog"></i> Settings</h1>
+        </div>
+
+        <div class="header-controls">
+            <div class="admin-profile">
+                <div class="admin-avatar">AS</div>
+                <div class="admin-info">
+                    <h3>Admin Sharma</h3>
+                    <p>Store Manager</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-container">
+        <!-- Settings Header -->
+        <div class="settings-header">
+            <h1><i class="fas fa-sliders-h"></i> Store Configuration</h1>
+            <p>Manage your store settings, email configurations, payment gateways, and other important configurations from one place.</p>
+        </div>
+
+        <!-- Success/Error Messages -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="settings-alert success">
+                <i class="fas fa-check-circle"></i>
+                <span>@TempData["SuccessMessage"]</span>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="settings-alert danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>@TempData["ErrorMessage"]</span>
+            </div>
+        }
+
+        <div class="settings-grid">
+            <!-- Settings Sidebar -->
+            <div class="settings-sidebar">
+                <ul class="settings-nav">
+                    <li class="settings-nav-item">
+                        <a href="#general" class="settings-nav-link active" onclick="showSection('general')">
+                            <i class="fas fa-store settings-nav-icon"></i>
+                            <span>General Settings</span>
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#business" class="settings-nav-link" onclick="showSection('business')">
+                            <i class="fas fa-chart-line settings-nav-icon"></i>
+                            <span>Business Settings</span>
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#email" class="settings-nav-link" onclick="showSection('email')">
+                            <i class="fas fa-envelope settings-nav-icon"></i>
+                            <span>Email Settings</span>
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#social" class="settings-nav-link" onclick="showSection('social')">
+                            <i class="fas fa-share-alt settings-nav-icon"></i>
+                            <span>Social Media</span>
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#maintenance" class="settings-nav-link" onclick="showSection('maintenance')">
+                            <i class="fas fa-tools settings-nav-icon"></i>
+                            <span>Maintenance</span>
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#security" class="settings-nav-link" onclick="showSection('security')">
+                            <i class="fas fa-shield-alt settings-nav-icon"></i>
+                            <span>Security</span>
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#seo" class="settings-nav-link" onclick="showSection('seo')">
+                            <i class="fas fa-search settings-nav-icon"></i>
+                            <span>SEO & Analytics</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="settings-preview" style="margin-top: 30px;">
+                    <h4 style="margin-bottom: 15px; color: var(--dark);">Last Updated</h4>
+                    <div class="preview-item">
+                        <span class="preview-label">Date:</span>
+                        <span class="preview-value">@Model.UpdatedAt.ToString("MMM dd, yyyy")</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Time:</span>
+                        <span class="preview-value">@Model.UpdatedAt.ToString("hh:mm tt")</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="settings-content">
+                <!-- General Settings Section -->
+                <div class="settings-section active" id="general-section">
+                    <div class="settings-section-header">
+                        <h2><i class="fas fa-store"></i> General Settings</h2>
+                        <div class="settings-section-actions">
+                            <button class="btn btn-secondary" onclick="saveSection('general')">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="general-form" class="settings-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="section" value="general" />
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="StoreName">
+                                    <i class="fas fa-signature"></i> Store Name
+                                </label>
+                                <input type="text" class="form-control" id="StoreName" name="StoreName" value="@Model.StoreName" required>
+                                <small class="form-text">This name will appear on your store and invoices</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="StoreLogoUrl">
+                                    <i class="fas fa-image"></i> Logo URL
+                                </label>
+                                <input type="url" class="form-control" id="StoreLogoUrl" name="StoreLogoUrl" value="@Model.StoreLogoUrl">
+                                <small class="form-text">Enter the URL of your store logo</small>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label class="form-label" for="StoreDescription">
+                                    <i class="fas fa-align-left"></i> Store Description
+                                </label>
+                                <textarea class="form-control" id="StoreDescription" name="StoreDescription" rows="3">@Model.StoreDescription</textarea>
+                                <small class="form-text">Brief description of your store for SEO</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="ContactEmail">
+                                    <i class="fas fa-envelope"></i> Contact Email
+                                </label>
+                                <input type="email" class="form-control" id="ContactEmail" name="ContactEmail" value="@Model.ContactEmail" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="ContactPhone">
+                                    <i class="fas fa-phone"></i> Contact Phone
+                                </label>
+                                <input type="tel" class="form-control" id="ContactPhone" name="ContactPhone" value="@Model.ContactPhone">
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label class="form-label" for="StoreAddress">
+                                    <i class="fas fa-map-marker-alt"></i> Store Address
+                                </label>
+                                <textarea class="form-control" id="StoreAddress" name="StoreAddress" rows="2">@Model.StoreAddress</textarea>
+                            </div>
+                        </div>
+
+                        <div class="settings-preview">
+                            <h4 style="margin-bottom: 15px; color: var(--dark);">Preview</h4>
+                            <div class="logo-preview">
+                                <img src="@Model.StoreLogoUrl" alt="Store Logo" onerror="this.src='/images/default-logo.png'">
+                            </div>
+                            <div class="preview-item">
+                                <span class="preview-label">Store Name:</span>
+                                <span class="preview-value">@Model.StoreName</span>
+                            </div>
+                            <div class="preview-item">
+                                <span class="preview-label">Contact Email:</span>
+                                <span class="preview-value">@Model.ContactEmail</span>
+                            </div>
+                            <div class="preview-item">
+                                <span class="preview-label">Contact Phone:</span>
+                                <span class="preview-value">@Model.ContactPhone</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Business Settings Section -->
+                <div class="settings-section" id="business-section">
+                    <div class="settings-section-header">
+                        <h2><i class="fas fa-chart-line"></i> Business Settings</h2>
+                        <div class="settings-section-actions">
+                            <button class="btn btn-secondary" onclick="saveSection('business')">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="business-form" class="settings-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="section" value="business" />
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="Currency">
+                                    <i class="fas fa-money-bill-wave"></i> Currency
+                                </label>
+                                <select class="form-control" id="Currency" name="Currency">
+                                    <option value="PKR" selected="@(Model.Currency == "PKR")">Pakistani Rupee (PKR)</option>
+                                    <option value="USD" selected="@(Model.Currency == "USD")">US Dollar (USD)</option>
+                                    <option value="EUR" selected="@(Model.Currency == "EUR")">Euro (EUR)</option>
+                                    <option value="GBP" selected="@(Model.Currency == "GBP")">British Pound (GBP)</option>
+                                    <option value="AED" selected="@(Model.Currency == "AED")">UAE Dirham (AED)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="CurrencySymbol">
+                                    <i class="fas fa-symbol"></i> Currency Symbol
+                                </label>
+                                <input type="text" class="form-control" id="CurrencySymbol" name="CurrencySymbol" value="@Model.CurrencySymbol">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="TaxPercentage">
+                                    <i class="fas fa-percentage"></i> Tax Percentage (%)
+                                </label>
+                                <input type="number" class="form-control" id="TaxPercentage" name="TaxPercentage" value="@Model.TaxPercentage" min="0" max="100" step="0.1">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="ShippingCost">
+                                    <i class="fas fa-shipping-fast"></i> Shipping Cost
+                                </label>
+                                <input type="number" class="form-control" id="ShippingCost" name="ShippingCost" value="@Model.ShippingCost" min="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="FreeShippingMinimum">
+                                    <i class="fas fa-truck-loading"></i> Free Shipping Minimum
+                                </label>
+                                <input type="number" class="form-control" id="FreeShippingMinimum" name="FreeShippingMinimum" value="@Model.FreeShippingMinimum" min="0">
+                                <small class="form-text">Minimum order amount for free shipping</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="MinimumOrderAmount">
+                                    <i class="fas fa-shopping-cart"></i> Minimum Order Amount
+                                </label>
+                                <input type="number" class="form-control" id="MinimumOrderAmount" name="MinimumOrderAmount" value="@Model.MinimumOrderAmount" min="0">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Email Settings Section -->
+                <div class="settings-section" id="email-section">
+                    <div class="settings-section-header">
+                        <h2><i class="fas fa-envelope"></i> Email Settings</h2>
+                        <div class="settings-section-actions">
+                            <button class="btn btn-secondary" onclick="saveSection('email')">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="email-form" class="settings-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="section" value="email" />
+
+                        <div class="settings-alert info">
+                            <i class="fas fa-info-circle"></i>
+                            <span>SMTP settings are used to send transactional emails to customers</span>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="SmtpServer">
+                                    <i class="fas fa-server"></i> SMTP Server
+                                </label>
+                                <input type="text" class="form-control" id="SmtpServer" name="SmtpServer" value="@Model.SmtpServer" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="SmtpPort">
+                                    <i class="fas fa-plug"></i> SMTP Port
+                                </label>
+                                <input type="number" class="form-control" id="SmtpPort" name="SmtpPort" value="@Model.SmtpPort" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="SmtpUsername">
+                                    <i class="fas fa-user"></i> SMTP Username
+                                </label>
+                                <input type="text" class="form-control" id="SmtpUsername" name="SmtpUsername" value="@Model.SmtpUsername" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="SmtpPassword">
+                                    <i class="fas fa-key"></i> SMTP Password
+                                </label>
+                                <input type="password" class="form-control" id="SmtpPassword" name="SmtpPassword" placeholder="Leave blank to keep current password">
+                                <small class="form-text">Enter new password only if you want to change it</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="SenderName">
+                                    <i class="fas fa-user-tag"></i> Sender Name
+                                </label>
+                                <input type="text" class="form-control" id="SenderName" name="SenderName" value="@Model.SenderName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="SenderEmail">
+                                    <i class="fas fa-at"></i> Sender Email
+                                </label>
+                                <input type="email" class="form-control" id="SenderEmail" name="SenderEmail" value="@Model.SenderEmail" required>
+                            </div>
+                        </div>
+
+                        <div class="settings-preview">
+                            <h4 style="margin-bottom: 15px; color: var(--dark);">Test Email Configuration</h4>
+                            <p>You can test your email configuration by sending a test email.</p>
+                            <button type="button" class="btn btn-outline" onclick="testEmail()" style="margin-top: 15px;">
+                                <i class="fas fa-paper-plane"></i> Send Test Email
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Social Media Section -->
+                <div class="settings-section" id="social-section">
+                    <div class="settings-section-header">
+                        <h2><i class="fas fa-share-alt"></i> Social Media</h2>
+                        <div class="settings-section-actions">
+                            <button class="btn btn-secondary" onclick="saveSection('social')">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="social-form" class="settings-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="section" value="social" />
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="FacebookUrl">
+                                    <i class="fab fa-facebook"></i> Facebook URL
+                                </label>
+                                <input type="url" class="form-control" id="FacebookUrl" name="FacebookUrl" value="@Model.FacebookUrl">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="InstagramUrl">
+                                    <i class="fab fa-instagram"></i> Instagram URL
+                                </label>
+                                <input type="url" class="form-control" id="InstagramUrl" name="InstagramUrl" value="@Model.InstagramUrl">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="TwitterUrl">
+                                    <i class="fab fa-twitter"></i> Twitter URL
+                                </label>
+                                <input type="url" class="form-control" id="TwitterUrl" name="TwitterUrl" value="@Model.TwitterUrl">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="YouTubeUrl">
+                                    <i class="fab fa-youtube"></i> YouTube URL
+                                </label>
+                                <input type="url" class="form-control" id="YouTubeUrl" name="YouTubeUrl" value="@Model.YouTubeUrl">
+                            </div>
+                        </div>
+
+                        <div class="settings-preview">
+                            <h4 style="margin-bottom: 15px; color: var(--dark);">Social Links Preview</h4>
+                            <div class="social-links">
+                                <a href="@Model.FacebookUrl" class="social-link facebook" target="_blank" title="Facebook">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="@Model.InstagramUrl" class="social-link instagram" target="_blank" title="Instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="@Model.TwitterUrl" class="social-link twitter" target="_blank" title="Twitter">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="@Model.YouTubeUrl" class="social-link youtube" target="_blank" title="YouTube">
+                                    <i class="fab fa-youtube"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Maintenance Section -->
+                <div class="settings-section" id="maintenance-section">
+                    <div class="settings-section-header">
+                        <h2><i class="fas fa-tools"></i> Maintenance</h2>
+                        <div class="settings-section-actions">
+                            <button class="btn btn-secondary" onclick="saveSection('maintenance')">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="maintenance-form" class="settings-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="section" value="maintenance" />
+
+                        <div class="settings-alert warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>When maintenance mode is enabled, only administrators can access the store</span>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="toggle-label" for="MaintenanceMode">
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="MaintenanceMode" name="MaintenanceMode" @(Model.MaintenanceMode ? "checked" : "")>
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                    <span>Enable Maintenance Mode</span>
+                                </label>
+                                <small class="form-text">When enabled, customers will see a maintenance message</small>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label class="form-label" for="MaintenanceMessage">
+                                    <i class="fas fa-comment-dots"></i> Maintenance Message
+                                </label>
+                                <textarea class="form-control" id="MaintenanceMessage" name="MaintenanceMessage" rows="3">@Model.MaintenanceMessage</textarea>
+                                <small class="form-text">This message will be displayed to customers during maintenance</small>
+                            </div>
+                        </div>
+
+                        <div class="settings-preview">
+                            <h4 style="margin-bottom: 15px; color: var(--dark);">Current Status</h4>
+                            <div class="preview-item">
+                                <span class="preview-label">Maintenance Mode:</span>
+                                <span class="preview-value @(Model.MaintenanceMode ? "active" : "inactive")">
+                                    @(Model.MaintenanceMode ? "Enabled" : "Disabled")
+                                </span>
+                            </div>
+                            @if (Model.MaintenanceMode)
+                            {
+                                <div class="preview-item">
+                                    <span class="preview-label">Message:</span>
+                                    <span class="preview-value">@Model.MaintenanceMessage</span>
+                                </div>
+                            }
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Security Section -->
+                <div class="settings-section" id="security-section">
+                    <div class="settings-section-header">
+                        <h2><i class="fas fa-shield-alt"></i> Security</h2>
+                        <div class="settings-section-actions">
+                            <button class="btn btn-secondary" onclick="saveSection('security')">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="security-form" class="settings-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="section" value="security" />
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="toggle-label" for="EnableTwoFactorAuth">
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="EnableTwoFactorAuth" name="EnableTwoFactorAuth" @(Model.EnableTwoFactorAuth ? "checked" : "")>
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                    <span>Enable Two-Factor Authentication</span>
+                                </label>
+                                <small class="form-text">Require 2FA for admin login</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="SessionTimeout">
+                                    <i class="fas fa-clock"></i> Session Timeout (minutes)
+                                </label>
+                                <input type="number" class="form-control" id="SessionTimeout" name="SessionTimeout" value="@Model.SessionTimeout" min="1" max="480">
+                                <small class="form-text">Auto logout after inactivity</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="MaxLoginAttempts">
+                                    <i class="fas fa-lock"></i> Max Login Attempts
+                                </label>
+                                <input type="number" class="form-control" id="MaxLoginAttempts" name="MaxLoginAttempts" value="@Model.MaxLoginAttempts" min="1" max="10">
+                                <small class="form-text">Maximum failed attempts before lockout</small>
+                            </div>
+                        </div>
+
+                        <div class="settings-preview">
+                            <h4 style="margin-bottom: 15px; color: var(--dark);">Security Status</h4>
+                            <div class="preview-item">
+                                <span class="preview-label">2FA:</span>
+                                <span class="preview-value @(Model.EnableTwoFactorAuth ? "active" : "inactive")">
+                                    @(Model.EnableTwoFactorAuth ? "Enabled" : "Disabled")
+                                </span>
+                            </div>
+                            <div class="preview-item">
+                                <span class="preview-label">Session Timeout:</span>
+                                <span class="preview-value">@Model.SessionTimeout minutes</span>
+                            </div>
+                            <div class="preview-item">
+                                <span class="preview-label">Max Login Attempts:</span>
+                                <span class="preview-value">@Model.MaxLoginAttempts</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- SEO & Analytics Section -->
+                <div class="settings-section" id="seo-section">
+                    <div class="settings-section-header">
+                        <h2><i class="fas fa-search"></i> SEO & Analytics</h2>
+                        <div class="settings-section-actions">
+                            <button class="btn btn-secondary" onclick="saveSection('seo')">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="seo-form" class="settings-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="section" value="seo" />
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="MetaTitle">
+                                    <i class="fas fa-heading"></i> Meta Title
+                                </label>
+                                <input type="text" class="form-control" id="MetaTitle" name="MetaTitle" value="@Model.MetaTitle" maxlength="60">
+                                <small class="form-text">Recommended: 50-60 characters</small>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label class="form-label" for="MetaDescription">
+                                    <i class="fas fa-align-left"></i> Meta Description
+                                </label>
+                                <textarea class="form-control" id="MetaDescription" name="MetaDescription" rows="3" maxlength="160">@Model.MetaDescription</textarea>
+                                <small class="form-text">Recommended: 150-160 characters</small>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label class="form-label" for="MetaKeywords">
+                                    <i class="fas fa-tags"></i> Meta Keywords
+                                </label>
+                                <input type="text" class="form-control" id="MetaKeywords" name="MetaKeywords" value="@Model.MetaKeywords">
+                                <small class="form-text">Comma separated keywords</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="GoogleAnalyticsId">
+                                    <i class="fab fa-google"></i> Google Analytics ID
+                                </label>
+                                <input type="text" class="form-control" id="GoogleAnalyticsId" name="GoogleAnalyticsId" value="@Model.GoogleAnalyticsId" placeholder="G-XXXXXXXXXX">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="FacebookPixelId">
+                                    <i class="fab fa-facebook"></i> Facebook Pixel ID
+                                </label>
+                                <input type="text" class="form-control" id="FacebookPixelId" name="FacebookPixelId" value="@Model.FacebookPixelId" placeholder="XXXXXXXXXXXXXXX">
+                            </div>
+                        </div>
+
+                        <div class="settings-preview">
+                            <h4 style="margin-bottom: 15px; color: var(--dark);">SEO Preview</h4>
+                            <div style="background: #f0f0f0; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                                <h4 style="color: #1a0dab; margin-bottom: 5px; font-size: 18px;">@Model.MetaTitle</h4>
+                                <p style="color: #006621; margin-bottom: 5px; font-size: 14px;">https://luxesuits.com</p>
+                                <p style="color: #545454; font-size: 14px;">@(Model.MetaDescription.Length > 150 ? Model.MetaDescription.Substring(0, 150) + "..." : Model.MetaDescription)</p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Global Actions -->
+                <div class="settings-actions">
+                    <div>
+                        <button class="btn btn-outline" onclick="showConfirmation()">
+                            <i class="fas fa-redo"></i> Reset to Default
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" onclick="saveAllSettings()">
+                            <i class="fas fa-save"></i> Save All Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirm Reset</h3>
+                <button class="modal-close" onclick="closeConfirmation()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to reset all settings to default values?</p>
+                <p style="color: var(--danger); font-weight: 500;">This action cannot be undone!</p>
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
+                    <button class="btn btn-outline" onclick="closeConfirmation()" style="flex: 1;">Cancel</button>
+                    <button class="btn btn-danger" onclick="resetToDefault()" style="flex: 1;">Reset Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle sidebar for mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Update logo preview in real-time
+        document.getElementById('StoreLogoUrl').addEventListener('input', function() {
+            const logoPreview = document.querySelector('.logo-preview img');
+            if (logoPreview) {
+                logoPreview.src = this.value || '/images/default-logo.png';
+            }
+        });
+
+        // Update social links in real-time
+        ['FacebookUrl', 'InstagramUrl', 'TwitterUrl', 'YouTubeUrl'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function() {
+                    const link = document.querySelector(`.social-link.${id.replace('Url', '').toLowerCase()}`);
+                    if (link) {
+                        link.href = this.value || '#';
+                    }
+                });
+            }
+        });
+    });
+
+    // Show section
+    function showSection(section) {
+        // Hide all sections
+        document.querySelectorAll('.settings-section').forEach(el => {
+            el.classList.remove('active');
+        });
+
+        // Remove active class from all nav links
+        document.querySelectorAll('.settings-nav-link').forEach(el => {
+            el.classList.remove('active');
+        });
+
+        // Show selected section
+        document.getElementById(`${section}-section`).classList.add('active');
+
+        // Activate corresponding nav link
+        const activeLink = document.querySelector(`.settings-nav-link[href="#${section}"]`);
+        if (activeLink) {
+            activeLink.classList.add('active');
+        }
+    }
+
+    // Save section
+    async function saveSection(section) {
+        showLoading(true);
+
+        const form = document.getElementById(`${section}-form`);
+        if (!form) {
+            showNotification('Form not found!', 'danger');
+            showLoading(false);
+            return;
+        }
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch('/Settings/UpdateSection', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showNotification(result.message, 'success');
+
+                // Update previews if needed
+                if (section === 'general') {
+                    updateGeneralPreview();
+                }
+            } else {
+                showNotification(result.message || 'Failed to save settings', 'danger');
+            }
+        } catch (error) {
+            console.error('Error saving settings:', error);
+            showNotification('Error saving settings. Please try again.', 'danger');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Save all settings
+    async function saveAllSettings() {
+        showLoading(true);
+
+        const sections = ['general', 'business', 'email', 'social', 'maintenance', 'security', 'seo'];
+        let hasError = false;
+
+        for (const section of sections) {
+            const form = document.getElementById(`${section}-form`);
+            if (form) {
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch('/Settings/UpdateSection', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+                    if (!result.success) {
+                        hasError = true;
+                        console.error(`Error saving ${section}:`, result.message);
+                    }
+                } catch (error) {
+                    hasError = true;
+                    console.error(`Error saving ${section}:`, error);
+                }
+            }
+        }
+
+        if (hasError) {
+            showNotification('Some settings could not be saved. Please check each section.', 'warning');
+        } else {
+            showNotification('All settings saved successfully!', 'success');
+            // Reload page to reflect changes
+            setTimeout(() => location.reload(), 1500);
+        }
+
+        showLoading(false);
+    }
+
+    // Reset to default
+    function showConfirmation() {
+        document.getElementById('confirmationModal').style.display = 'block';
+    }
+
+    function closeConfirmation() {
+        document.getElementById('confirmationModal').style.display = 'none';
+    }
+
+    async function resetToDefault() {
+        showLoading(true);
+        closeConfirmation();
+
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            const response = await fetch('/Settings/ResetToDefault', {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token || ''
+                }
+            });
+
+            if (response.ok) {
+                showNotification('Settings reset to default values!', 'success');
+                // Reload page after 2 seconds
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showNotification('Failed to reset settings', 'danger');
+            }
+        } catch (error) {
+            console.error('Error resetting settings:', error);
+            showNotification('Error resetting settings', 'danger');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Test email configuration
+    async function testEmail() {
+        showLoading(true);
+
+        try {
+            const response = await fetch('/Settings/TestEmail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                }
+            });
+
+            if (response.ok) {
+                showNotification('Test email sent successfully!', 'success');
+            } else {
+                const result = await response.json();
+                showNotification(result.message || 'Failed to send test email', 'danger');
+            }
+        } catch (error) {
+            console.error('Error sending test email:', error);
+            showNotification('Error sending test email', 'danger');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Update general preview
+    function updateGeneralPreview() {
+        const storeName = document.getElementById('StoreName').value;
+        const contactEmail = document.getElementById('ContactEmail').value;
+        const contactPhone = document.getElementById('ContactPhone').value;
+
+        document.querySelectorAll('.preview-item').forEach(item => {
+            const label = item.querySelector('.preview-label');
+            if (label) {
+                if (label.textContent.includes('Store Name')) {
+                    item.querySelector('.preview-value').textContent = storeName;
+                } else if (label.textContent.includes('Contact Email')) {
+                    item.querySelector('.preview-value').textContent = contactEmail;
+                } else if (label.textContent.includes('Contact Phone')) {
+                    item.querySelector('.preview-value').textContent = contactPhone;
+                }
+            }
+        });
+    }
+
+    // Show loading overlay
+    function showLoading(show) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+    }
+
+    // Notification function
+    function showNotification(message, type) {
+        // Remove existing notifications
+        document.querySelectorAll('.custom-notification').forEach(n => n.remove());
+
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'custom-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            padding: 18px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 3000;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Poppins', sans-serif;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        `;
+
+        // Set color based on type
+        const colors = {
+            'success': 'linear-gradient(135deg, var(--success), #2e7d32)',
+            'warning': 'linear-gradient(135deg, var(--warning), #ff8f00)',
+            'info': 'linear-gradient(135deg, var(--info), #1565c0)',
+            'danger': 'linear-gradient(135deg, var(--danger), #c62828)'
+        };
+
+        notification.style.background = colors[type] || 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+
+        // Add icon based on type
+        const icons = {
+            'success': 'check-circle',
+            'warning': 'exclamation-triangle',
+            'info': 'info-circle',
+            'danger': 'times-circle'
+        };
+
+        notification.innerHTML = `<i class="fas fa-${icons[type] || 'info-circle'}"></i> ${message}`;
+
+        // Add to document
+        document.body.appendChild(notification);
+
+        // Add animation
+        const style = document.createElement('style');
+        style.textContent = `
+    @@keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+    @@keyframes fadeOut {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(100%); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Remove after 4 seconds
+        setTimeout(() => {
+            notification.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 4000);
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('confirmationModal');
+        if (event.target === modal) {
+            closeConfirmation();
+        }
+    };
+</script>

@@ -1,0 +1,558 @@
+﻿@model E_Commerce.Models.Order
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Track Order";
+}
+<link rel="stylesheet" href="~/user/order/track.css" />
+
+<!-- Track Order Page -->
+<div class="track-order-container" style="margin-top: 80px;">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="/Order/MyOrders"><i class="fas fa-arrow-left"></i> Back to Orders</a>
+        <span class="separator">/</span>
+        <a href="/Order/Details/@Model.Id">Order Details</a>
+    </div>
+
+    <!-- Order Header -->
+    <div class="track-header">
+        <div class="header-content">
+            <h1><i class="fas fa-map-marker-alt"></i> Track Your Order</h1>
+            <div class="order-info">
+                <h2>Order #@Model.OrderNumber</h2>
+                <div class="order-meta">
+                    <span class="date">
+                        <i class="far fa-calendar-alt"></i>
+                        Ordered on @Model.CreatedAt.ToString("MMMM dd, yyyy")
+                    </span>
+                    <span class="status-badge @Model.Status.ToString().ToLower()">
+                        <i class="@GetStatusIcon(Model.Status)"></i>
+                        @Model.Status.ToString()
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="delivery-estimate">
+            <div class="estimate-card">
+                <div class="estimate-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="estimate-details">
+                    <h3>Estimated Delivery</h3>
+                    <p class="date">@GetEstimatedDeliveryDate(Model.Status, Model.CreatedAt)</p>
+                    <p class="note">We'll notify you if there are any changes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="track-content">
+        <!-- Left Column: Tracking Timeline -->
+        <div class="tracking-timeline">
+            <h3><i class="fas fa-route"></i> Order Journey</h3>
+
+            <div class="timeline-container">
+                @if (ViewBag.Timeline != null)
+                {
+                    var timeline = ViewBag.Timeline as List<E_Commerce.Models.TrackingEvent>;
+                    if (timeline != null && timeline.Any())
+                    {
+                        foreach (var step in timeline)
+                        {
+                            <div class="timeline-step @(step.IsCompleted ? "completed" : "upcoming")">
+                                <div class="step-indicator">
+                                    <div class="step-icon">
+                                        <i class="@step.Icon"></i>
+                                    </div>
+                                    <div class="step-line"></div>
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-header">
+                                        <h4>@step.Title</h4>
+                                        <span class="step-date">@step.Date.ToString("MMM dd, yyyy hh:mm tt")</span>
+                                    </div>
+                                    <p>@step.Description</p>
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+                else
+                {
+                    <div class="no-tracking">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Tracking information will be available once your order is processed.</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Delivery Progress -->
+            @if (Model.Status == Order.OrderStatus.Shipped || Model.Status == Order.OrderStatus.Delivered)
+            {
+                <div class="delivery-progress">
+                    <h4><i class="fas fa-truck-loading"></i> Delivery Progress</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: @GetProgressPercentage(Model.Status)%"></div>
+                    </div>
+                    <div class="progress-labels">
+                        <span class="label">Ordered</span>
+                        <span class="label">Confirmed</span>
+                        <span class="label">Shipped</span>
+                        <span class="label">Delivered</span>
+                    </div>
+                    <div class="progress-percentage">
+                        <span>@GetProgressPercentage(Model.Status)% Complete</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Right Column: Delivery Details -->
+        <div class="delivery-details">
+            <!-- Shipping Address -->
+            <div class="detail-card">
+                <h3><i class="fas fa-map-marked-alt"></i> Delivery Address</h3>
+                @if (Model.OrderAddress != null)
+                {
+                    <div class="address-details">
+                        <div class="address-info">
+                            <h4>@Model.OrderAddress.FullName</h4>
+                            <p><i class="fas fa-map-marker-alt"></i> @Model.OrderAddress.AddressLine</p>
+                            <p><i class="fas fa-city"></i> @Model.OrderAddress.City - @Model.OrderAddress.PostalCode</p>
+                            <p><i class="fas fa-phone"></i> @Model.OrderAddress.Phone</p>
+                        </div>
+                        <div class="address-actions">
+                            @if (Model.Status == Order.OrderStatus.Pending || Model.Status == Order.OrderStatus.Confirmed)
+                            {
+                                <button class="btn-edit-address" onclick="editDeliveryAddress(@Model.Id)">
+                                    <i class="fas fa-edit"></i> Update Address
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-address">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>No delivery address provided</p>
+                        @if (Model.Status == Order.OrderStatus.Pending)
+                        {
+                            <button class="btn-add-address" onclick="addDeliveryAddress(@Model.Id)">
+                                <i class="fas fa-plus"></i> Add Delivery Address
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Delivery Information -->
+            <div class="detail-card">
+                <h3><i class="fas fa-info-circle"></i> Delivery Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Shipping Method</h4>
+                            <p>Standard Delivery (3-5 business days)</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Processing Time</h4>
+                            <p>1-2 business days</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Package Details</h4>
+                            <p>@Model.Items.Count item(s), @Model.Items.Sum(i => i.Quantity) total units</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-undo"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Returns Policy</h4>
+                            <p>Easy 15-day returns</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Support -->
+            <div class="detail-card support-card">
+                <h3><i class="fas fa-headset"></i> Need Help with Delivery?</h3>
+                <div class="support-content">
+                    <p>If you have any questions about your delivery, our support team is here to help.</p>
+                    <div class="support-contacts">
+                        <a href="tel:031533007757" class="contact-btn phone">
+                            <i class="fas fa-phone"></i> Call Delivery Team
+                        </a>
+                        <a href="mailto:delivery@ecommerce.com" class="contact-btn email">
+                            <i class="fas fa-envelope"></i> Email Support
+                        </a>
+                        <button class="contact-btn chat" onclick="openLiveChat()">
+                            <i class="fas fa-comments"></i> Live Chat
+                        </button>
+                    </div>
+                    <div class="support-note">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Delivery support available Monday-Saturday, 9 AM to 6 PM</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="detail-card actions-card">
+                <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                <div class="action-buttons">
+                    <a href="/Order/Details/@Model.Id" class="btn-action">
+                        <i class="fas fa-eye"></i> View Order Details
+                    </a>
+
+                    @if (Model.Status == Order.OrderStatus.Pending || Model.Status == Order.OrderStatus.Cancelled)
+                    {
+                        <button class="btn-action" onclick="retryPayment(@Model.Id)">
+                            <i class="fas fa-redo"></i> Retry Payment
+                        </button>
+                    }
+
+                    @if (Model.Status == Order.OrderStatus.Pending)
+                    {
+                        <button class="btn-action" onclick="cancelOrder(@Model.Id)">
+                            <i class="fas fa-times"></i> Cancel Order
+                        </button>
+                    }
+
+                    <button class="btn-action" onclick="downloadInvoice(@Model.Id)">
+                        <i class="fas fa-download"></i> Download Invoice
+                    </button>
+
+                    <button class="btn-action" onclick="shareTracking(@Model.OrderNumber)">
+                        <i class="fas fa-share-alt"></i> Share Tracking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delivery Address Modal -->
+<!-- Delivery Address Modal -->
+<div id="addressModal" class="modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Update Delivery Address</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addressForm">
+                <input type="hidden" id="modalOrderId" />
+
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="modalFullName" required placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="modalPhone" required placeholder="Enter your phone number">
+                </div>
+
+                <div class="form-group">
+                    <label for="addressLine">Address Line *</label>
+                    <input type="text" id="modalAddressLine" required placeholder="House No, Street, Area">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">City *</label>
+                        <input type="text" id="modalCity" required placeholder="Enter your city">
+                    </div>
+                    <div class="form-group">
+                        <label for="postalCode">Postal Code *</label>
+                        <input type="text" id="modalPostalCode" required placeholder="Enter postal code">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeAddressModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Confirmation Modal -->
+@await Html.PartialAsync("_Confirmation")
+
+<!-- Toast Notification -->
+@await Html.PartialAsync("_Toast")
+
+
+@functions {
+    private string GetStatusIcon(Order.OrderStatus status)
+    {
+        return status switch
+        {
+            Order.OrderStatus.Pending => "fas fa-clock",
+            Order.OrderStatus.Confirmed => "fas fa-check-circle",
+            Order.OrderStatus.Cancelled => "fas fa-times-circle",
+            Order.OrderStatus.Shipped => "fas fa-shipping-fast",
+            Order.OrderStatus.Delivered => "fas fa-box-open",
+            _ => "fas fa-clock"
+        };
+    }
+
+    private string GetEstimatedDeliveryDate(Order.OrderStatus status, DateTime orderDate)
+    {
+        return status switch
+        {
+            Order.OrderStatus.Delivered => "Delivered",
+            Order.OrderStatus.Shipped => orderDate.AddDays(3).ToString("MMMM dd, yyyy"),
+            Order.OrderStatus.Confirmed => orderDate.AddDays(5).ToString("MMMM dd, yyyy"),
+            _ => orderDate.AddDays(7).ToString("MMMM dd, yyyy")
+        };
+    }
+
+    private int GetProgressPercentage(Order.OrderStatus status)
+    {
+        return status switch
+        {
+            Order.OrderStatus.Pending => 25,
+            Order.OrderStatus.Confirmed => 50,
+            Order.OrderStatus.Shipped => 75,
+            Order.OrderStatus.Delivered => 100,
+            Order.OrderStatus.Cancelled => 0,
+            _ => 0
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        // Function to open address modal for editing
+        function editDeliveryAddress(orderId) {
+            // Load existing address data if available
+            fetch(`/Order/GetOrderAddress/${orderId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('modalFullName').value = data.address.fullName || '';
+                        document.getElementById('modalPhone').value = data.address.phone || '';
+                        document.getElementById('modalAddressLine').value = data.address.addressLine || '';
+                        document.getElementById('modalCity').value = data.address.city || '';
+                        document.getElementById('modalPostalCode').value = data.address.postalCode || '';
+                    }
+                })
+                .catch(error => console.error('Error loading address:', error));
+
+            document.getElementById('modalOrderId').value = orderId;
+            document.getElementById('addressModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Function to open address modal for adding new address
+        function addDeliveryAddress(orderId) {
+            document.getElementById('modalOrderId').value = orderId;
+            document.getElementById('modalFullName').value = '';
+            document.getElementById('modalPhone').value = '';
+            document.getElementById('modalAddressLine').value = '';
+            document.getElementById('modalCity').value = '';
+            document.getElementById('modalPostalCode').value = '';
+            document.getElementById('addressModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Function to close address modal
+        function closeAddressModal() {
+            document.getElementById('addressModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Handle address form submission
+        document.getElementById('addressForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const orderId = document.getElementById('modalOrderId').value;
+            const addressData = {
+                orderId: parseInt(orderId),
+                fullName: document.getElementById('modalFullName').value.trim(),
+                phone: document.getElementById('modalPhone').value.trim(),
+                addressLine: document.getElementById('modalAddressLine').value.trim(),
+                city: document.getElementById('modalCity').value.trim(),
+                postalCode: document.getElementById('modalPostalCode').value.trim()
+            };
+
+            // Save address
+            fetch('/Order/UpdateOrderAddress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify(addressData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Address updated successfully!', 'success');
+                    closeAddressModal();
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showToast(data.message || 'Error updating address', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating address:', error);
+                showToast('Error updating address. Please try again.', 'error');
+            });
+        });
+
+        // Other action functions
+        function retryPayment(orderId) {
+            if (confirm('Do you want to retry payment for this order?')) {
+                fetch(`/Order/RetryPayment/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Redirecting to payment...', 'success');
+                        setTimeout(() => {
+                            window.location.href = data.redirectUrl || '/Checkout';
+                        }, 1500);
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error processing request', 'error');
+                });
+            }
+        }
+
+        function cancelOrder(orderId) {
+            if (confirm('Are you sure you want to cancel this order?')) {
+                fetch(`/Order/CancelOrder/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Order cancelled successfully', 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error cancelling order', 'error');
+                });
+            }
+        }
+
+        function downloadInvoice(orderId) {
+            showToast('Downloading invoice...', 'info');
+            window.open(`/Order/DownloadInvoice/${orderId}`, '_blank');
+        }
+
+        function shareTracking(orderNumber) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Track My Order',
+                    text: `Track my order ${orderNumber}`,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                showToast('Tracking link copied to clipboard!', 'success');
+            }
+        }
+
+        function openLiveChat() {
+            showToast('Opening live chat...', 'info');
+            // Implement live chat opening logic here
+        }
+
+        // Initialize modal close buttons
+        // Add this to prevent modal flash
+        document.addEventListener('DOMContentLoaded', function () {
+            // Force hide all modals on page load
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+
+            // Initialize modal close buttons
+            document.querySelectorAll('.close-modal').forEach(button => {
+                button.addEventListener('click', function () {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            });
+
+            // Modal overlay click to close
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function () {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            });
+
+            // Escape key to close modals
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        if (modal.style.display === 'block' ||
+                            modal.style.display === 'flex' ||
+                            getComputedStyle(modal).display !== 'none') {
+                            modal.style.display = 'none';
+                            document.body.style.overflow = 'auto';
+                        }
+                    });
+                }
+            });
+        });
+
+        // Toast function
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+
+            if (toast && toastMessage) {
+                toastMessage.textContent = message;
+                toast.className = `toast show ${type}`;
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+    </script>
+}

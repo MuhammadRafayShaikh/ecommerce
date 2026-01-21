@@ -1,0 +1,312 @@
+﻿@{
+    Layout = "_Layout1";
+}
+<link rel="stylesheet" href="~/admin/order/order.css" />
+<div class="main-content" id="mainContent">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <h1><i class="fas fa-receipt"></i> <span id="pageTitle">Order Management</span></h1>
+        </div>
+
+        <div class="header-controls">
+            <button class="btn btn-secondary" onclick="refreshOrders()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn btn-primary" onclick="exportOrders()">
+                <i class="fas fa-download"></i> Export
+            </button>
+            <div class="admin-profile">
+                <div class="admin-avatar">AS</div>
+                <div class="admin-info">
+                    <h3>Admin Sharma</h3>
+                    <p>Order Manager</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Page -->
+    <div class="page-container active" id="ordersPage">
+        <!-- Order Statistics -->
+        <div class="order-stats">
+            <div class="stat-card stat-pending">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="pendingCount">0</h3>
+                    <p>Pending Orders</p>
+                </div>
+            </div>
+
+            <div class="stat-card stat-confirmed">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="confirmedCount">0</h3>
+                    <p>Confirmed</p>
+                </div>
+            </div>
+
+            <div class="stat-card stat-shipped">
+                <div class="stat-icon">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="shippedCount">0</h3>
+                    <p>Shipped</p>
+                </div>
+            </div>
+
+            <div class="stat-card stat-delivered">
+                <div class="stat-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="deliveredCount">0</h3>
+                    <p>Delivered</p>
+                </div>
+            </div>
+
+            <div class="stat-card stat-cancelled">
+                <div class="stat-icon">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="cancelledCount">0</h3>
+                    <p>Cancelled</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label>Order Status</label>
+                <select class="filter-select" id="statusFilter" onchange="filterOrders()">
+                    <option value="all">All Status</option>
+                    <option value="0">Pending</option>
+                    <option value="1">Confirmed</option>
+                    <option value="3">Shipped</option>
+                    <option value="4">Delivered</option>
+                    <option value="2">Cancelled</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Payment Status</label>
+                <select class="filter-select" id="paymentFilter" onchange="filterOrders()">
+                    <option value="all">All Payments</option>
+                    <option value="1">Success</option>
+                    <option value="0">Pending</option>
+                    <option value="2">Failed</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Date Range</label>
+                <div class="date-filter">
+                    <input type="date" class="date-input" id="startDate" onchange="filterOrders()">
+                    <span>to</span>
+                    <input type="date" class="date-input" id="endDate" onchange="filterOrders()">
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button class="btn btn-outline" onclick="clearFilters()">
+                    <i class="fas fa-filter"></i> Clear Filters
+                </button>
+                <button class="btn btn-primary" onclick="applyFilters()">
+                    <i class="fas fa-search"></i> Apply
+                </button>
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="orders-table-container">
+            <div class="table-header">
+                <h2><i class="fas fa-list"></i> All Orders</h2>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="orderSearch" placeholder="Search by order ID, customer, email..." onkeyup="searchOrders()">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable">
+                        <!-- Orders will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="empty-state" id="ordersEmptyState" style="display: none;">
+                <i class="fas fa-receipt"></i>
+                <h3>No orders found</h3>
+                <p>Try adjusting your search or filter criteria.</p>
+            </div>
+
+            <div class="pagination" id="pagination" style="display: none;">
+                <button onclick="changePage(-1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button onclick="changePage(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal-overlay" id="orderModal" style="display: none;">
+        <div class="order-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-invoice"></i> Order Details: <span id="modalOrderId">#ORD-001</span></h2>
+                <button class="close-modal" onclick="closeOrderModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="order-details-grid">
+                    <div class="order-detail-section">
+                        <h3><i class="fas fa-user"></i> Customer Information</h3>
+                        <div class="detail-row">
+                            <span class="detail-label">Customer Name</span>
+                            <span class="detail-value" id="customerName">Loading...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Email</span>
+                            <span class="detail-value" id="customerEmail">Loading...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Phone</span>
+                            <span class="detail-value" id="customerPhone">Loading...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Customer Since</span>
+                            <span class="detail-value" id="customerSince">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="order-detail-section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Shipping Address</h3>
+                        <div class="detail-row">
+                            <span class="detail-label">Full Name</span>
+                            <span class="detail-value" id="shippingName">Loading...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Phone</span>
+                            <span class="detail-value" id="shippingPhone">Loading...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Address</span>
+                            <span class="detail-value" id="shippingAddress">Loading...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">City & ZIP</span>
+                            <span class="detail-value" id="shippingCity">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="order-detail-section">
+                        <h3><i class="fas fa-info-circle"></i> Order Information</h3>
+                        <div class="detail-row">
+                            <span class="detail-label">Order Date</span>
+                            <span class="detail-value" id="orderDate">Loading...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Order Status</span>
+                            <span class="detail-value status" id="orderStatus">Loading...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Payment Status</span>
+                            <span class="detail-value status" id="paymentStatus">Loading...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Payment Method</span>
+                            <span class="detail-value" id="paymentMethod">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="order-detail-section">
+                    <h3><i class="fas fa-shopping-bag"></i> Order Items</h3>
+                    <table class="order-items-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Color</th>
+                                <th>Size</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orderItemsTable">
+                            <!-- Order items will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <h3><i class="fas fa-calculator"></i> Order Summary</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Subtotal</span>
+                        <span class="detail-value" id="subTotal">₹0.00</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Discount</span>
+                        <span class="detail-value" id="discountTotal">₹0.00</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Shipping</span>
+                        <span class="detail-value" id="shippingFee">₹0.00</span>
+                    </div>
+                    <div class="detail-row total">
+                        <span class="detail-label">Grand Total</span>
+                        <span class="detail-value" id="grandTotal">₹0.00</span>
+                    </div>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="modal-actions">
+                    <select class="status-select" id="updateStatus">
+                        <option value="0">Pending</option>
+                        <option value="1">Confirmed</option>
+                        <option value="3">Shipped</option>
+                        <option value="4">Delivered</option>
+                        <option value="2">Cancelled</option>
+                    </select>
+                    <button class="btn btn-outline" onclick="closeOrderModal()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                    <button class="btn btn-primary" onclick="updateOrderStatus()">
+                        <i class="fas fa-save"></i> Update Status
+                    </button>
+                    <button class="btn btn-secondary" onclick="printOrder()">
+                        <i class="fas fa-print"></i> Print Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/admin/order/order.js"></script>

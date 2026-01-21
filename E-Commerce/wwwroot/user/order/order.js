@@ -36,10 +36,17 @@ function initializeEventListeners() {
     document.querySelectorAll('.btn-view-details').forEach(button => {
         button.addEventListener('click', function (e) {
             e.preventDefault();
-            const orderId = this.closest('.order-card').querySelector('.btn-retry-payment')?.dataset.orderId;
-            if (orderId) {
-                loadOrderDetails(orderId);
+
+            // href se orderId nikalo
+            const href = this.getAttribute('href'); // /Orders/Details/12
+            const orderId = href.split('/').pop();
+
+            if (!orderId) {
+                showToast('Invalid order id', 'error');
+                return;
             }
+
+            loadOrderDetails(orderId);
         });
     });
 
@@ -108,11 +115,13 @@ function filterOrders() {
 
     orders.forEach(order => {
         if (currentFilter === 'all') {
-            order.style.display = 'flex';
+            order.style.display = 'block';
         } else {
             const status = order.dataset.status;
-            if (status === currentFilter) {
-                order.style.display = 'flex';
+            //alert(status)
+            //alert(currentFilter)
+            if (status.toLowerCase() === currentFilter.toLowerCase()) {
+                order.style.display = 'block';
             } else {
                 order.style.display = 'none';
             }
@@ -224,7 +233,7 @@ async function loadOrderDetails(orderId) {
     showLoading('Loading order details...');
 
     try {
-        const response = await fetch(`/Orders/Details/${orderId}`);
+        const response = await fetch(`/Order/Details/${orderId}`);
         const html = await response.text();
         hideLoading();
 

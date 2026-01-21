@@ -36,7 +36,11 @@ namespace E_Commerce.Controllers
 
             if (order == null)
                 return NotFound();
-
+            if(order.Status != Order.OrderStatus.Pending || order.Status == Order.OrderStatus.Cancelled)
+            {
+                TempData["error"] = "Already confirmed order";
+                return RedirectToAction("MyOrders","Order");
+            }
             // Get user's default address if exists
             var defaultAddress = await _context.OrderAddress
                 .FirstOrDefaultAsync(a => a.OrderId == orderId);
@@ -182,7 +186,7 @@ namespace E_Commerce.Controllers
                     success = true,
                     message = model.IsSuccess ? "Payment successful!" : "Payment failed",
                     orderStatus = order.Status.ToString(),
-                    redirectUrl = model.IsSuccess ? "/Orders/MyOrders" : "/Checkout/Failed"
+                    redirectUrl = model.IsSuccess ? "/Order/MyOrders" : "/Checkout/Failed"
                 });
             }
             catch (Exception ex)

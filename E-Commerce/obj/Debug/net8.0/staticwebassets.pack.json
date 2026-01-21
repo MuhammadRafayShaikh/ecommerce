@@ -125,6 +125,14 @@
       "PackagePath": "staticwebassets\\admin\\category.js"
     },
     {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\admin\\customers\\customer.css",
+      "PackagePath": "staticwebassets\\admin\\customers\\customer.css"
+    },
+    {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\admin\\customers\\customer.js",
+      "PackagePath": "staticwebassets\\admin\\customers\\customer.js"
+    },
+    {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\admin\\discount.css",
       "PackagePath": "staticwebassets\\admin\\discount.css"
     },
@@ -139,6 +147,14 @@
     {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\admin\\editproduct.js",
       "PackagePath": "staticwebassets\\admin\\editproduct.js"
+    },
+    {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\admin\\order\\order.css",
+      "PackagePath": "staticwebassets\\admin\\order\\order.css"
+    },
+    {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\admin\\order\\order.js",
+      "PackagePath": "staticwebassets\\admin\\order\\order.js"
     },
     {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\admin\\product.css",
@@ -187,6 +203,10 @@
     {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\favicon.ico",
       "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\images\\logo.png",
+      "PackagePath": "staticwebassets\\images\\logo.png"
     },
     {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\js\\site.js",
@@ -507,6 +527,10 @@
     {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\order\\orders.css",
       "PackagePath": "staticwebassets\\user\\order\\orders.css"
+    },
+    {
+      "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\order\\track.css",
+      "PackagePath": "staticwebassets\\user\\order\\track.css"
     },
     {
       "Id": "C:\\Users\\Rohaan\\source\\repos\\E-Commerce\\E-Commerce\\wwwroot\\user\\sales\\sales.css",

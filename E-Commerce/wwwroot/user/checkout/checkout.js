@@ -244,10 +244,9 @@ async function processPayment() {
 
             // Update progress steps
             updateProgressSteps(3);
-
             // Redirect to orders page after delay
             setTimeout(() => {
-                window.location.href = result.redirectUrl || '/Orders/MyOrders';
+                window.location.href = result.redirectUrl || '/Order/MyOrders';
             }, 2000);
         } else {
             showToast(result.message || 'Payment failed. Please try again.', 'error');
@@ -412,8 +411,8 @@ function hideLoading() {
 }
 
 // Toast function (from cart.js)
-function showToast(message, type = 'info') {
-    // This should be already defined in your _Toast partial
-    // If not, implement it here
-    console.log(`${type}: ${message}`);
-}
+//function showToast(message, type = 'info') {
+//    // This should be already defined in your _Toast partial
+//    // If not, implement it here
+//    console.log(`${type}: ${message}`);
+//}

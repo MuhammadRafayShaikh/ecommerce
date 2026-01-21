@@ -310,6 +310,9 @@ namespace E_Commerce.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
                     b.ToTable("OrderAddress");
                 });
 
@@ -338,14 +341,20 @@ namespace E_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductColorId");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("OrderItems");
                 });
@@ -548,6 +557,160 @@ namespace E_Commerce.Migrations
                     b.ToTable("ProductVideos");
                 });
 
+            modelBuilder.Entity("E_Commerce.Models.Settings", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContactEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPhone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("PKR");
+
+                    b.Property<string>("CurrencySymbol")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EnableTwoFactorAuth")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("FacebookPixelId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FacebookUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("FreeShippingMinimum")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("GoogleAnalyticsId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InstagramUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaintenanceMessage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("MaintenanceMode")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("MaxLoginAttempts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(5);
+
+                    b.Property<string>("MetaDescription")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<string>("MetaKeywords")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MetaTitle")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<decimal>("MinimumOrderAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SenderName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SessionTimeout")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(30);
+
+                    b.Property<decimal>("ShippingCost")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(200m);
+
+                    b.Property<string>("SmtpPassword")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SmtpPort")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(587);
+
+                    b.Property<string>("SmtpServer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SmtpUsername")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StoreAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StoreDescription")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("StoreLogoUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StoreName")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("Luxe Suits");
+
+                    b.Property<decimal>("TaxPercentage")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(16m);
+
+                    b.Property<string>("TwitterUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("YouTubeUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Settings");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -741,13 +904,42 @@ namespace E_Commerce.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("E_Commerce.Models.OrderAddress", b =>
+                {
+                    b.HasOne("E_Commerce.Models.Order", "Order")
+                        .WithOne("OrderAddress")
+                        .HasForeignKey("E_Commerce.Models.OrderAddress", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("E_Commerce.Models.OrderItem", b =>
                 {
-                    b.HasOne("E_Commerce.Models.Order", null)
+                    b.HasOne("E_Commerce.Models.Order", "Order")
                         .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("E_Commerce.Models.ProductColor", "ProductColor")
+                        .WithMany()
+                        .HasForeignKey("ProductColorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("E_Commerce.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("ProductColor");
                 });
 
             modelBuilder.Entity("E_Commerce.Models.Payment", b =>
@@ -867,6 +1059,9 @@ namespace E_Commerce.Migrations
             modelBuilder.Entity("E_Commerce.Models.Order", b =>
                 {
                     b.Navigation("Items");
+
+                    b.Navigation("OrderAddress")
+                        .IsRequired();
 
                     b.Navigation("Payments");
                 });

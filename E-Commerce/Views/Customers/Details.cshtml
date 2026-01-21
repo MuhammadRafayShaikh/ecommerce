@@ -1,0 +1,77 @@
+﻿@model ApplicationUser
+@{
+    Layout = null;
+}
+<div class="customer-detail-row">
+    <div class="customer-detail-label">Full Name:</div>
+    <div class="customer-detail-value">@Model.FirstName @Model.LastName</div>
+</div>
+
+<div class="customer-detail-row">
+    <div class="customer-detail-label">Email:</div>
+    <div class="customer-detail-value">@Model.Email</div>
+</div>
+
+<div class="customer-detail-row">
+    <div class="customer-detail-label">Username:</div>
+    <div class="customer-detail-value">@Model.UserName</div>
+</div>
+
+<div class="customer-detail-row">
+    <div class="customer-detail-label">Phone:</div>
+    <div class="customer-detail-value">@(Model.PhoneNumber ?? "Not provided")</div>
+</div>
+
+<div class="customer-detail-row">
+    <div class="customer-detail-label">Email Confirmed:</div>
+    <div class="customer-detail-value">
+        @if (Model.EmailConfirmed)
+        {
+            <span class="status-active" style="display: inline-block;">Confirmed</span>
+        }
+        else
+        {
+            <span class="status-inactive" style="display: inline-block;">Not Confirmed</span>
+        }
+    </div>
+</div>
+
+<div class="customer-detail-row">
+    <div class="customer-detail-label">Account Status:</div>
+    <div class="customer-detail-value">
+        @if (Model.Status)
+        {
+            <span class="status-active" style="display: inline-block;">Active</span>
+        }
+        else
+        {
+            <span class="status-inactive" style="display: inline-block;">Inactive</span>
+        }
+    </div>
+</div>
+
+<div class="customer-detail-row">
+    <div class="customer-detail-label">Account Created:</div>
+    <div class="customer-detail-value">@Model.CreatedAt.ToString("MMMM dd, yyyy hh:mm tt")</div>
+</div>
+
+<div class="customer-detail-row">
+    <div class="customer-detail-label">Last Updated:</div>
+    <div class="customer-detail-value">
+        @if (Model.UpdatedAt.HasValue)
+        {
+            @Model.UpdatedAt.Value.ToString("MMMM dd, yyyy hh:mm tt")
+        }
+        else
+        {
+            <span>Never</span>
+        }
+    </div>
+</div>
+
+<div class="customer-detail-row">
+    <div class="customer-detail-label">Account ID:</div>
+    <div class="customer-detail-value">
+        <small>@Model.Id</small>
+    </div>
+</div>

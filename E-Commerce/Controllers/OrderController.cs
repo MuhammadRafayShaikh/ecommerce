@@ -399,6 +399,7 @@ namespace E_Commerce.Controllers
                 // Get order
                 var order = await _myDbContext.Orders
                     .Where(o => o.Id == id && o.UserId == userId)
+                    .Include(x => x.Items)
                     .Include(o => o.OrderAddress)
                     .FirstOrDefaultAsync();
 
@@ -466,13 +467,145 @@ namespace E_Commerce.Controllers
             }
         }
 
-        public class TrackingEvent
+        // GET: Get order address for editing
+        [HttpGet]
+        public async Task<IActionResult> GetOrderAddress(int id)
         {
-            public string Title { get; set; }
-            public string Description { get; set; }
-            public DateTime Date { get; set; }
-            public string Icon { get; set; }
-            public bool IsCompleted { get; set; }
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(userId))
+                    return Json(new { success = false, message = "User not logged in" });
+
+                var order = await _myDbContext.Orders
+                    .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
+
+                if (order == null)
+                    return Json(new { success = false, message = "Order not found" });
+
+                var address = await _myDbContext.OrderAddress
+                    .FirstOrDefaultAsync(a => a.OrderId == id);
+
+                if (address == null)
+                    return Json(new { success = false, message = "Address not found" });
+
+                return Json(new
+                {
+                    success = true,
+                    address = new
+                    {
+                        fullName = address.FullName,
+                        phone = address.Phone,
+                        addressLine = address.AddressLine,
+                        city = address.City,
+                        postalCode = address.PostalCode
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex, "Error getting order address");
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
+        }
+
+        // POST: Update order address
+        [HttpPost]
+        public async Task<IActionResult> UpdateOrderAddress([FromBody] UpdateOrderAddressModel model)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(userId))
+                    return Json(new { success = false, message = "User not logged in" });
+
+                var order = await _myDbContext.Orders
+                    .FirstOrDefaultAsync(o => o.Id == model.OrderId && o.UserId == userId);
+
+                if (order == null)
+                    return Json(new { success = false, message = "Order not found" });
+
+                // Check if order can be updated
+                if (order.Status != Order.OrderStatus.Pending && order.Status != Order.OrderStatus.Confirmed)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Cannot update address for order with status: " + order.Status
+                    });
+                }
+
+                var existingAddress = await _myDbContext.OrderAddress
+                    .FirstOrDefaultAsync(a => a.OrderId == model.OrderId);
+
+                if (existingAddress == null)
+                {
+                    // Create new address
+                    var address = new OrderAddress
+                    {
+                        OrderId = model.OrderId,
+                        FullName = model.FullName,
+                        Phone = model.Phone,
+                        AddressLine = model.AddressLine,
+                        City = model.City,
+                        PostalCode = model.PostalCode
+                    };
+
+                    _myDbContext.OrderAddress.Add(address);
+                }
+                else
+                {
+                    // Update existing address
+                    existingAddress.FullName = model.FullName;
+                    existingAddress.Phone = model.Phone;
+                    existingAddress.AddressLine = model.AddressLine;
+                    existingAddress.City = model.City;
+                    existingAddress.PostalCode = model.PostalCode;
+                }
+
+                await _myDbContext.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Address updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex, "Error updating order address");
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
+        }
+
+        // GET: Download invoice
+        [HttpGet]
+        public async Task<IActionResult> DownloadInvoice(int id)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(userId))
+                    return RedirectToAction("Login", "Account");
+
+                var order = await _myDbContext.Orders
+                    .Where(o => o.Id == id && o.UserId == userId)
+                    .Include(o => o.Items)
+                        .ThenInclude(oi => oi.Product)
+                    .Include(o => o.OrderAddress)
+                    .FirstOrDefaultAsync();
+
+                if (order == null)
+                    return NotFound();
+
+                // Generate invoice PDF (simplified - you'd use a PDF library like iTextSharp)
+                // For now, return a simple HTML view
+                return View("Invoice", order);
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex, "Error downloading invoice");
+                return RedirectToAction("Details", new { id });
+            }
         }
 
     }

@@ -1,0 +1,1158 @@
+﻿@model IEnumerable<ApplicationUser>
+@{
+    ViewData["Title"] = "Customer Management";
+    Layout = "_Layout1";
+}
+
+<style>
+    /* Enhanced Customer Management Styles */
+    :root {
+        --primary: #9c27b0;
+        --primary-light: #e1bee7;
+        --primary-dark: #7b1fa2;
+        --secondary: #ff4081;
+        --accent: #ff9800;
+        --light: #f9f0fa;
+        --dark: #2d1b33;
+        --success: #4caf50;
+        --warning: #ffc107;
+        --danger: #f44336;
+        --info: #2196f3;
+        --card-shadow: 0 10px 30px rgba(156, 39, 176, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    /* Stats Cards Enhancement */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 35px;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, white 0%, #fdfdfd 100%);
+        border-radius: 18px;
+        padding: 30px;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        align-items: center;
+        transition: var(--transition);
+        animation: fadeInUp 0.6s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(156, 39, 176, 0.08);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        border-radius: 18px 18px 0 0;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(156, 39, 176, 0.15);
+    }
+
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 25px;
+        font-size: 28px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon.total { 
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+    }
+    .stat-icon.active { 
+        background: linear-gradient(135deg, var(--success), #2e7d32);
+        color: white;
+    }
+    .stat-icon.new { 
+        background: linear-gradient(135deg, var(--info), #1565c0);
+        color: white;
+    }
+    .stat-icon.inactive { 
+        background: linear-gradient(135deg, var(--danger), #c62828);
+        color: white;
+    }
+
+    .stat-info h3 {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: var(--dark);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .stat-info p {
+        color: #666;
+        font-size: 15px;
+        font-weight: 500;
+    }
+
+    /* Table Container Enhancement */
+    .customers-table-container {
+        background-color: white;
+        border-radius: 20px;
+        padding: 35px;
+        box-shadow: var(--card-shadow);
+        animation: fadeInUp 0.6s ease;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid rgba(156, 39, 176, 0.08);
+        margin-bottom: 40px;
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f5f5f5;
+    }
+
+    .table-header h2 {
+        font-size: 26px;
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+    }
+
+    .table-header h2 i {
+        color: var(--primary);
+        background: rgba(156, 39, 176, 0.1);
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .table-controls {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .search-box {
+        position: relative;
+        width: 350px;
+    }
+
+    .search-box form {
+        margin: 0;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 14px 20px 14px 50px;
+        border: 2px solid #eee;
+        border-radius: 12px;
+        font-size: 15px;
+        transition: var(--transition);
+        background: #f9f9f9;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(156, 39, 176, 0.1);
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #888;
+        font-size: 16px;
+    }
+
+    .btn {
+        padding: 14px 28px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, var(--primary-dark), #6a1b9a);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(156, 39, 176, 0.3);
+    }
+
+    /* Table Styles */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        border-radius: 12px;
+        border: 1px solid #eee;
+    }
+
+    .customers-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1000px;
+    }
+
+    .customers-table thead {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    }
+
+    .customers-table th {
+        text-align: left;
+        padding: 20px 15px;
+        color: white;
+        font-weight: 600;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .customers-table th:first-child {
+        border-radius: 10px 0 0 0;
+    }
+
+    .customers-table th:last-child {
+        border-radius: 0 10px 0 0;
+    }
+
+    .customers-table td {
+        padding: 20px 15px;
+        border-bottom: 1px solid #f5f5f5;
+        font-size: 15px;
+        vertical-align: middle;
+        color: #555;
+    }
+
+    .customers-table tbody tr {
+        transition: var(--transition);
+    }
+
+    .customers-table tbody tr:hover {
+        background-color: rgba(156, 39, 176, 0.03);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Customer Info Styles */
+    .customer-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .customer-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        margin-right: 15px;
+        font-size: 16px;
+        box-shadow: 0 4px 10px rgba(156, 39, 176, 0.2);
+    }
+
+    .customer-name {
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 3px;
+        font-size: 16px;
+    }
+
+    .customer-username {
+        font-size: 13px;
+        color: #777;
+    }
+
+    /* Status Styles */
+    .customer-status {
+        padding: 8px 18px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-block;
+        letter-spacing: 0.3px;
+    }
+
+    .status-active {
+        background-color: rgba(76, 175, 80, 0.15);
+        color: #2e7d32;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .status-inactive {
+        background-color: rgba(244, 67, 54, 0.15);
+        color: #c62828;
+        border: 1px solid rgba(244, 67, 54, 0.3);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 16px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-view {
+        background: linear-gradient(135deg, var(--info), #1565c0);
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: linear-gradient(135deg, #1565c0, #0d47a1);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+    }
+
+    .btn-toggle {
+        background: linear-gradient(135deg, var(--warning), #ff8f00);
+        color: white;
+    }
+
+    .btn-toggle:hover {
+        background: linear-gradient(135deg, #ff8f00, #ef6c00);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, var(--danger), #c62828);
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: linear-gradient(135deg, #c62828, #b71c1c);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(244, 67, 54, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #777;
+    }
+
+    .empty-state i {
+        font-size: 80px;
+        color: #e0e0e0;
+        margin-bottom: 25px;
+        opacity: 0.6;
+    }
+
+    .empty-state h3 {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: #aaa;
+        font-weight: 500;
+    }
+
+    .empty-state p {
+        font-size: 16px;
+        color: #bbb;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    /* Modal Enhancement */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.3s ease;
+        backdrop-filter: blur(3px);
+    }
+
+    .modal-content {
+        background-color: white;
+        margin: 8% auto;
+        width: 90%;
+        max-width: 700px;
+        border-radius: 20px;
+        animation: slideDown 0.4s ease;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        border: 1px solid rgba(156, 39, 176, 0.1);
+    }
+
+    .modal-header {
+        padding: 25px 30px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+    }
+
+    .modal-header h3 {
+        color: white;
+        font-size: 24px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .modal-close {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        cursor: pointer;
+        color: white;
+        font-size: 20px;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg);
+    }
+
+    .modal-body {
+        padding: 30px;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .customer-detail-row {
+        display: flex;
+        margin-bottom: 18px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #f5f5f5;
+        align-items: flex-start;
+    }
+
+    .customer-detail-label {
+        font-weight: 600;
+        color: var(--dark);
+        width: 180px;
+        flex-shrink: 0;
+        font-size: 15px;
+    }
+
+    .customer-detail-value {
+        flex: 1;
+        color: #555;
+        font-size: 15px;
+        word-break: break-word;
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 40px;
+        gap: 8px;
+    }
+
+    .page-link {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        background-color: white;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #555;
+        font-weight: 500;
+        font-size: 15px;
+    }
+
+    .page-link:hover, .page-link.active {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(156, 39, 176, 0.2);
+    }
+
+    /* Header Enhancement */
+    .header-title h1 {
+        font-size: 32px;
+        color: var(--dark);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-title h1 i {
+        color: var(--primary);
+        background: rgba(156, 39, 176, 0.1);
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    /* Animations */
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @@keyframes fadeInUp {
+        from { 
+            opacity: 0; 
+            transform: translateY(30px);
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes slideDown {
+        from { 
+            opacity: 0; 
+            transform: translateY(-50px);
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 1400px) {
+        .stats-container,
+        .customers-table-container {
+            max-width: 1200px;
+        }
+    }
+
+    @@media (max-width: 1200px) {
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .search-box {
+            width: 300px;
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .table-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        
+        .table-controls {
+            width: 100%;
+        }
+        
+        .search-box {
+            width: 100%;
+        }
+        
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .customers-table-container {
+            padding: 20px;
+        }
+        
+        .stat-card {
+            padding: 20px;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            margin-right: 20px;
+            font-size: 24px;
+        }
+        
+        .stat-info h3 {
+            font-size: 30px;
+        }
+        
+        .modal-content {
+            margin: 15% auto;
+            width: 95%;
+        }
+        
+        .customer-detail-row {
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .customer-detail-label {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .action-buttons {
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .btn-icon {
+            width: 100%;
+            height: 40px;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .table-controls {
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+</style>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <h1><i class="fas fa-users"></i> Customer Management</h1>
+        </div>
+
+        <div class="header-controls">
+            <div class="admin-profile">
+                <div class="admin-avatar">AS</div>
+                <div class="admin-info">
+                    <h3>Admin Sharma</h3>
+                    <p>Store Manager</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-container" id="statsContainer">
+        <!-- Stats will be loaded via AJAX -->
+    </div>
+
+    <!-- Customer Table -->
+    <div class="customers-table-container">
+        <div class="table-header">
+            <h2><i class="fas fa-user-friends"></i> All Customers</h2>
+            <div class="table-controls">
+                <div class="search-box">
+                    <form method="get" id="searchForm" action="/Customers">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="search" value="" placeholder="Search by name, email or phone..." onkeyup="debounceSearch()">
+                    </form>
+                </div>
+                <button class="btn btn-secondary" onclick="refreshCustomers()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="customers-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Joined Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="customersTableBody">
+                    @foreach (var customer in Model)
+                    {
+                        <tr id="customer-@customer.Id">
+                            <td><span class="customer-id">@customer.Id.Substring(0, 8)...</span></td>
+                            <td>
+                                <div class="customer-info">
+                                    <div class="customer-avatar">
+                                        @customer.FirstName[0]@customer.LastName[0]
+                                    </div>
+                                    <div class="customer-details">
+                                        <div class="customer-name">@customer.FirstName @customer.LastName</div>
+                                        <div class="customer-username">@@@customer.UserName</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@customer.Email</td>
+                            <td>@(customer.PhoneNumber ?? "Not set")</td>
+                            <td>@customer.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                <span class="customer-status status-@(customer.Status ? "active" : "inactive")">
+                                    @(customer.Status ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon btn-view" onclick="viewCustomer('@customer.Id')" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn-icon btn-toggle" onclick="toggleStatus('@customer.Id')" title="@(customer.Status ? "Deactivate" : "Activate")">
+                                        <i class="fas fa-power-off"></i>
+                                    </button>
+                                    <button class="btn-icon btn-delete" onclick="deleteCustomer('@customer.Id')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+                <i class="fas fa-user-slash"></i>
+                <h3>No customers found</h3>
+                <p>@(string.IsNullOrEmpty(ViewBag.SearchTerm) ? "There are no customers yet. Start by registering users." : "No customers match your search. Try different keywords.")</p>
+            </div>
+        }
+
+        <!-- Pagination -->
+        @if (ViewBag.TotalPages > 1)
+        {
+            <div class="pagination">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                       asp-route-search="@ViewBag.SearchTerm"
+                       class="page-link">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                }
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <a asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-search="@ViewBag.SearchTerm"
+                       class="page-link @(i == ViewBag.CurrentPage ? "active" : "")">
+                        @i
+                    </a>
+                }
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                       asp-route-search="@ViewBag.SearchTerm"
+                       class="page-link">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Customer Details Modal -->
+    <div class="modal" id="customerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-circle"></i> Customer Details</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="customerDetails">
+                <!-- Customer details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        loadStats();
+
+        // Toggle sidebar for mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    });
+
+    // Load statistics
+    async function loadStats() {
+        try {
+            const response = await fetch('/Customers/GetStats');
+            const stats = await response.json();
+
+            const statsContainer = document.getElementById('statsContainer');
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon total">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>${stats.total}</h3>
+                        <p>Total Customers</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon active">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>${stats.active}</h3>
+                        <p>Active Customers</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon new">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>${stats.newToday}</h3>
+                        <p>New Today</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon inactive">
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>${stats.inactive}</h3>
+                        <p>Inactive Customers</p>
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error loading stats:', error);
+            // Fallback static stats
+            document.getElementById('statsContainer').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon total">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>${document.querySelectorAll('#customersTableBody tr').length}</h3>
+                        <p>Total Customers</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon active">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>${document.querySelectorAll('.status-active').length}</h3>
+                        <p>Active Customers</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon new">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>0</h3>
+                        <p>New Today</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon inactive">
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>${document.querySelectorAll('.status-inactive').length}</h3>
+                        <p>Inactive Customers</p>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // Search with debounce
+    let searchTimeout;
+    function debounceSearch() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            document.getElementById('searchForm').submit();
+        }, 500);
+    }
+
+    // Refresh customers
+    function refreshCustomers() {
+        location.reload();
+    }
+
+    // View customer details
+    async function viewCustomer(customerId) {
+        try {
+            showLoadingModal();
+            const response = await fetch('/Customers/Details/' + customerId);
+            const html = await response.text();
+
+            document.getElementById('customerDetails').innerHTML = html;
+            document.getElementById('customerModal').style.display = 'block';
+        } catch (error) {
+            console.error('Error loading customer details:', error);
+            showNotification('Failed to load customer details', 'danger');
+        }
+    }
+
+    // Toggle customer status
+    async function toggleStatus(customerId) {
+        if (!confirm('Are you sure you want to change this customer\'s status?')) {
+            return;
+        }
+
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            const response = await fetch('/Customers/ToggleStatus/' + customerId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token || ''
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                const row = document.getElementById(`customer-${customerId}`);
+                const statusSpan = row.querySelector('.customer-status');
+                const toggleButton = row.querySelector('.btn-toggle');
+
+                if (result.status) {
+                    statusSpan.className = 'customer-status status-active';
+                    statusSpan.textContent = 'Active';
+                    toggleButton.title = 'Deactivate';
+                } else {
+                    statusSpan.className = 'customer-status status-inactive';
+                    statusSpan.textContent = 'Inactive';
+                    toggleButton.title = 'Activate';
+                }
+
+                showNotification('Customer status updated successfully', 'success');
+                loadStats();
+            } else {
+                showNotification(result.message || 'Failed to update status', 'danger');
+            }
+        } catch (error) {
+            console.error('Error toggling status:', error);
+            showNotification('Failed to update customer status', 'danger');
+        }
+    }
+
+    // Delete customer
+    async function deleteCustomer(customerId) {
+        if (!confirm('Are you sure you want to deactivate this customer? They will no longer be able to access their account.')) {
+            return;
+        }
+
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            const response = await fetch('/Customers/Delete/' + customerId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token || ''
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                const row = document.getElementById(`customer-${customerId}`);
+                row.querySelector('.customer-status').className = 'customer-status status-inactive';
+                row.querySelector('.customer-status').textContent = 'Inactive';
+                
+                showNotification(result.message || 'Customer deactivated successfully', 'warning');
+                loadStats();
+            } else {
+                showNotification(result.message || 'Failed to deactivate customer', 'danger');
+            }
+        } catch (error) {
+            console.error('Error deleting customer:', error);
+            showNotification('Failed to deactivate customer', 'danger');
+        }
+    }
+
+    // Close modal
+    function closeModal() {
+        document.getElementById('customerModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('customerModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    // Show loading modal
+    function showLoadingModal() {
+        document.getElementById('customerDetails').innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <div class="loading-spinner" style="width: 50px; height: 50px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                <p>Loading customer details...</p>
+                <style>@@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+            </div>
+        `;
+    }
+
+    // Notification function
+    function showNotification(message, type) {
+        // Remove existing notifications
+        document.querySelectorAll('.custom-notification').forEach(n => n.remove());
+
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'custom-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            padding: 18px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 3000;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Poppins', sans-serif;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        `;
+
+        // Set color based on type
+        const colors = {
+            'success': 'linear-gradient(135deg, var(--success), #2e7d32)',
+            'warning': 'linear-gradient(135deg, var(--warning), #ff8f00)',
+            'info': 'linear-gradient(135deg, var(--info), #1565c0)',
+            'danger': 'linear-gradient(135deg, var(--danger), #c62828)',
+            'primary': 'linear-gradient(135deg, var(--primary), var(--primary-dark))'
+        };
+
+        notification.style.background = colors[type] || colors['primary'];
+
+        // Add icon based on type
+        const icons = {
+            'success': 'check-circle',
+            'warning': 'exclamation-triangle',
+            'info': 'info-circle',
+            'danger': 'times-circle'
+        };
+
+        notification.innerHTML = `<i class="fas fa-${icons[type] || 'info-circle'}"></i> ${message}`;
+
+        // Add to document
+        document.body.appendChild(notification);
+
+        // Add animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @@keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @@keyframes fadeOut {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(100%); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Remove after 4 seconds
+        setTimeout(() => {
+            notification.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 4000);
+    }
+</script>

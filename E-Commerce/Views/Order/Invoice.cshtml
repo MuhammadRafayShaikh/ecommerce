@@ -1,0 +1,80 @@
+﻿@model E_Commerce.Models.Order
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Invoice - @Model.OrderNumber</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .invoice-header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+        .invoice-details { margin-bottom: 30px; }
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .items-table th, .items-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        .summary { float: right; width: 300px; border-top: 2px solid #333; padding-top: 20px; }
+        .footer { margin-top: 50px; text-align: center; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="invoice-header">
+        <h1>INVOICE</h1>
+        <h2>Order #@Model.OrderNumber</h2>
+        <p>Date: @Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
+    </div>
+
+    <div class="invoice-details">
+        @if (Model.OrderAddress != null)
+        {
+            <h3>Shipping Address:</h3>
+            <p>@Model.OrderAddress.FullName</p>
+            <p>@Model.OrderAddress.AddressLine</p>
+            <p>@Model.OrderAddress.City - @Model.OrderAddress.PostalCode</p>
+            <p>Phone: @Model.OrderAddress.Phone</p>
+        }
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Color</th>
+                <th>Size</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.Product?.Name</td>
+                    <td>@item.ProductColor?.ColorName</td>
+                    <td>@item.Size</td>
+                    <td>@item.Quantity</td>
+                    <td>₹@item.UnitPrice.ToString("N0")</td>
+                    <td>₹@item.TotalPrice.ToString("N0")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <p><strong>Subtotal:</strong> ₹@Model.SubTotal.ToString("N0")</p>
+        @if (Model.DiscountTotal > 0)
+        {
+            <p><strong>Discount:</strong> -₹@Model.DiscountTotal.ToString("N0")</p>
+        }
+        <p><strong>Shipping:</strong> ₹@Model.Shipping.ToString("N0")</p>
+        <p><strong>Grand Total:</strong> ₹@Model.GrandTotal.ToString("N0")</p>
+    </div>
+
+    <div class="footer">
+        <p>Thank you for your purchase!</p>
+        <p>This is a computer-generated invoice and does not require a signature.</p>
+    </div>
+</body>
+</html>
